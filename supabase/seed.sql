@@ -13,6 +13,23 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- Host:       owner@voltspot.demo           / Owner123!
 -- Superadmin: nothingisspecial78@gmail.com  / abdu@1027
 
+-- Fix any existing NULL token columns in auth.users (prevents GoTrue scanner 500 error)
+UPDATE auth.users 
+SET 
+  confirmation_token = COALESCE(confirmation_token, ''),
+  recovery_token = COALESCE(recovery_token, ''),
+  email_change_token_new = COALESCE(email_change_token_new, ''),
+  email_change = COALESCE(email_change, ''),
+  email_change_token_current = COALESCE(email_change_token_current, ''),
+  phone_change = COALESCE(phone_change, ''),
+  phone_change_token = COALESCE(phone_change_token, ''),
+  reauthentication_token = COALESCE(reauthentication_token, '')
+WHERE 
+  confirmation_token IS NULL 
+  OR recovery_token IS NULL 
+  OR email_change_token_new IS NULL 
+  OR email_change IS NULL;
+
 INSERT INTO auth.users (
   instance_id,
   id,
@@ -23,6 +40,14 @@ INSERT INTO auth.users (
   email_confirmed_at,
   raw_app_meta_data,
   raw_user_meta_data,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  email_change_token_current,
+  phone_change,
+  phone_change_token,
+  reauthentication_token,
   created_at,
   updated_at
 )
@@ -37,6 +62,7 @@ VALUES
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"display_name":"Rahul Driver","role":"driver","phone":"+91 98765 43210"}',
+    '', '', '', '', '', '', '', '',
     NOW(),
     NOW()
   ),
@@ -50,6 +76,7 @@ VALUES
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"display_name":"Kiran (Charge Point Host)","role":"admin","phone":"+91 98450 12345"}',
+    '', '', '', '', '', '', '', '',
     NOW(),
     NOW()
   ),
@@ -63,6 +90,7 @@ VALUES
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"display_name":"Abdulla (Superadmin)","role":"superadmin","phone":"+91 94470 99999"}',
+    '', '', '', '', '', '', '', '',
     NOW(),
     NOW()
   )
@@ -70,7 +98,15 @@ ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   encrypted_password = EXCLUDED.encrypted_password,
   email_confirmed_at = NOW(),
-  raw_user_meta_data = EXCLUDED.raw_user_meta_data;
+  raw_user_meta_data = EXCLUDED.raw_user_meta_data,
+  confirmation_token = '',
+  recovery_token = '',
+  email_change_token_new = '',
+  email_change = '',
+  email_change_token_current = '',
+  phone_change = '',
+  phone_change_token = '',
+  reauthentication_token = '';
 
 -- Link Auth Identities (Safe insertion supporting Supabase GoTrue schema)
 DO $$
