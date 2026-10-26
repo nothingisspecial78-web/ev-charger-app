@@ -96,8 +96,8 @@ export const ConfirmModal: React.FC<{
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150">
+      <div className="bg-white rounded-2xl max-w-md w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl border border-gray-100 space-y-4">
         <h3 className="text-lg font-bold text-[#17231F]">{title}</h3>
         <p className="text-sm text-[#66736D] leading-relaxed">{message}</p>
 
@@ -117,18 +117,18 @@ export const ConfirmModal: React.FC<{
           </div>
         )}
 
-        <div className="flex gap-3 justify-end pt-2">
+        <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 justify-end pt-2">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition min-h-[44px] flex items-center justify-center"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={() => onConfirm(note)}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition ${
+            className={`w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl text-sm font-semibold text-white transition min-h-[44px] flex items-center justify-center ${
               isDestructive
                 ? 'bg-rose-600 hover:bg-rose-700 shadow-sm'
                 : 'bg-[#174D3A] hover:bg-[#123D2E] shadow-sm'

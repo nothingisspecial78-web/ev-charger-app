@@ -8,10 +8,10 @@ import {
   SuperadminMetrics,
 } from '@/types';
 
-// Default realistic seed data matching supabase/seed.sql
+// Default realistic seed data with valid hex UUIDs matching supabase/seed.sql
 const INITIAL_PROFILES: Profile[] = [
   {
-    id: 'd1111111-1111-1111-1111-111111111111',
+    id: 'd1111111-1111-4111-8111-111111111111',
     display_name: 'Rahul Driver',
     role: 'driver',
     phone: '+91 98765 43210',
@@ -19,7 +19,7 @@ const INITIAL_PROFILES: Profile[] = [
     updated_at: new Date(Date.now() - 86400000 * 5).toISOString(),
   },
   {
-    id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'a2222222-2222-4222-8222-222222222222',
     display_name: 'Kiran (Charge Point Host)',
     role: 'admin',
     phone: '+91 98450 12345',
@@ -27,8 +27,8 @@ const INITIAL_PROFILES: Profile[] = [
     updated_at: new Date(Date.now() - 86400000 * 10).toISOString(),
   },
   {
-    id: 's3333333-3333-3333-3333-333333333333',
-    display_name: 'Ananya (Platform Admin)',
+    id: 'e3333333-3333-4333-8333-333333333333',
+    display_name: 'Abdulla (Platform Superadmin)',
     role: 'superadmin',
     phone: '+91 94470 99999',
     created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
@@ -38,8 +38,8 @@ const INITIAL_PROFILES: Profile[] = [
 
 const INITIAL_CHARGERS: Charger[] = [
   {
-    id: 'c1111111-0000-0000-0000-000000000001',
-    owner_id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'c1111111-0000-4000-8000-000000000001',
+    owner_id: 'a2222222-2222-4222-8222-222222222222',
     name: 'Central Market Fast Charge',
     description: 'High-speed DC fast charger located in the secure ground parking lot of Central Commercial Complex. Well-lit area with café and restroom nearby.',
     address: 'Plot 14, Commercial Lane, Near Central Market, Kozhikode, Kerala 673001',
@@ -57,8 +57,8 @@ const INITIAL_CHARGERS: Charger[] = [
     updated_at: new Date(Date.now() - 86400000 * 1).toISOString(),
   },
   {
-    id: 'c1111111-0000-0000-0000-000000000002',
-    owner_id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'c1111111-0000-4000-8000-000000000002',
+    owner_id: 'a2222222-2222-4222-8222-222222222222',
     name: 'Riverside AC Point',
     description: 'Reliable AC destination charger beside Riverside Avenue. Ideal for longer parking and overnight replenishment.',
     address: 'Riverside Avenue, Near Municipal Bridge, Tirur, Kerala 676101',
@@ -76,8 +76,8 @@ const INITIAL_CHARGERS: Charger[] = [
     updated_at: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
-    id: 'c1111111-0000-0000-0000-000000000003',
-    owner_id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'c1111111-0000-4000-8000-000000000003',
+    owner_id: 'a2222222-2222-4222-8222-222222222222',
     name: 'Station Road Charge Hub',
     description: 'Convenient rapid charging right across the railway station transit terminal.',
     address: 'Station Road, Near Railway Junction, Malappuram, Kerala 676505',
@@ -95,8 +95,8 @@ const INITIAL_CHARGERS: Charger[] = [
     updated_at: new Date(Date.now() - 86400000 * 1).toISOString(),
   },
   {
-    id: 'c1111111-0000-0000-0000-000000000004',
-    owner_id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'c1111111-0000-4000-8000-000000000004',
+    owner_id: 'a2222222-2222-4222-8222-222222222222',
     name: 'Calicut Bypass DC Express',
     description: 'Dual-gun 120kW ultra-rapid charger right off the national highway bypass.',
     address: 'NH 66 Bypass Road, Pantheeramkavu, Kozhikode, Kerala 673019',
@@ -114,8 +114,8 @@ const INITIAL_CHARGERS: Charger[] = [
     updated_at: new Date(Date.now() - 86400000 * 1).toISOString(),
   },
   {
-    id: 'c1111111-0000-0000-0000-000000000005',
-    owner_id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'c1111111-0000-4000-8000-000000000005',
+    owner_id: 'a2222222-2222-4222-8222-222222222222',
     name: 'Hillside Eco Point (Maintenance)',
     description: 'Community charger undergoing routine terminal software calibration.',
     address: 'Wayanad Ghat Road Junction, Lakkidi, Kerala 673576',
@@ -136,10 +136,10 @@ const INITIAL_CHARGERS: Charger[] = [
 
 const INITIAL_REQUESTS: BookingRequest[] = [
   {
-    id: 'r1111111-0000-0000-0000-000000000001',
-    charger_id: 'c1111111-0000-0000-0000-000000000001',
-    driver_id: 'd1111111-1111-1111-1111-111111111111',
-    requested_start: new Date(Date.now() + 7200000).toISOString(), // 2 hours from now
+    id: 'b1111111-0000-4000-8000-000000000001',
+    charger_id: 'c1111111-0000-4000-8000-000000000001',
+    driver_id: 'd1111111-1111-4111-8111-111111111111',
+    requested_start: new Date(Date.now() + 7200000).toISOString(),
     duration_minutes: 45,
     driver_note: 'Driving a Tata Nexon EV with 18% charge remaining. Arriving around 4:30 PM.',
     status: 'pending',
@@ -147,15 +147,15 @@ const INITIAL_REQUESTS: BookingRequest[] = [
     updated_at: new Date(Date.now() - 1800000).toISOString(),
   },
   {
-    id: 'r1111111-0000-0000-0000-000000000002',
-    charger_id: 'c1111111-0000-0000-0000-000000000002',
-    driver_id: 'd1111111-1111-1111-1111-111111111111',
+    id: 'b1111111-0000-4000-8000-000000000002',
+    charger_id: 'c1111111-0000-4000-8000-000000000002',
+    driver_id: 'd1111111-1111-4111-8111-111111111111',
     requested_start: new Date(Date.now() - 86400000).toISOString(),
     duration_minutes: 60,
     driver_note: 'Overnight top-up session requested.',
     status: 'approved',
-    owner_response_note: 'Bay reserved. Safe journey!',
-    decided_by: 'a2222222-2222-2222-2222-222222222222',
+    owner_response_note: 'Slot confirmed. Please proceed to Bay #2.',
+    decided_by: 'a2222222-2222-4222-8222-222222222222',
     decided_at: new Date(Date.now() - 80000000).toISOString(),
     created_at: new Date(Date.now() - 86400000).toISOString(),
     updated_at: new Date(Date.now() - 80000000).toISOString(),
@@ -163,13 +163,12 @@ const INITIAL_REQUESTS: BookingRequest[] = [
 ];
 
 const STORAGE_KEYS = {
-  CHARGERS: 'voltspot_chargers',
-  REQUESTS: 'voltspot_requests',
-  PROFILES: 'voltspot_profiles',
-  AUDIT_LOGS: 'voltspot_audit_logs',
+  CHARGERS: 'voltspot_chargers_v2',
+  REQUESTS: 'voltspot_requests_v2',
+  PROFILES: 'voltspot_profiles_v2',
+  AUDIT_LOGS: 'voltspot_audit_logs_v2',
 };
 
-// Local storage storage helper
 class LocalStore {
   static get<T>(key: string, defaultVal: T): T {
     try {
@@ -200,7 +199,7 @@ class LocalStore {
   }
 }
 
-// Initialise storage if first run
+// Initialise storage
 if (typeof window !== 'undefined') {
   LocalStore.get(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS);
   LocalStore.get(STORAGE_KEYS.REQUESTS, INITIAL_REQUESTS);
@@ -209,12 +208,10 @@ if (typeof window !== 'undefined') {
 }
 
 export const DataService = {
-  // RESET DEMO DATA
   resetDemoData(): void {
     LocalStore.reset();
   },
 
-  // 1. GET PUBLISHED CHARGERS FOR DRIVER DISCOVERY
   async getPublishedChargers(filters?: ChargerFilters): Promise<Charger[]> {
     if (isSupabaseConfigured && supabase) {
       try {
@@ -240,11 +237,10 @@ export const DataService = {
         const { data, error } = await query;
         if (!error && data) return data as Charger[];
       } catch (err) {
-        console.warn('Supabase query failed, falling back to local persistent store:', err);
+        console.warn('Supabase query fallback to local store:', err);
       }
     }
 
-    // Local fallback
     let list = LocalStore.get<Charger[]>(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS)
       .filter(c => c.is_published && c.is_active);
 
@@ -288,7 +284,6 @@ export const DataService = {
     }));
   },
 
-  // 2. GET CHARGER BY ID
   async getChargerById(id: string): Promise<Charger | null> {
     if (isSupabaseConfigured && supabase) {
       try {
@@ -299,7 +294,7 @@ export const DataService = {
           .single();
         if (!error && data) return data as Charger;
       } catch (err) {
-        console.warn('Supabase fetch charger failed, fallback to local store:', err);
+        console.warn('Supabase fetch charger failed:', err);
       }
     }
 
@@ -314,7 +309,6 @@ export const DataService = {
     };
   },
 
-  // 3. OWNER: GET OWN CHARGERS
   async getOwnerChargers(ownerId: string): Promise<Charger[]> {
     if (isSupabaseConfigured && supabase) {
       try {
@@ -333,7 +327,6 @@ export const DataService = {
     return chargers.filter(c => c.owner_id === ownerId);
   },
 
-  // 4. OWNER: CREATE CHARGER
   async createCharger(
     ownerId: string,
     input: Omit<Charger, 'id' | 'owner_id' | 'created_at' | 'updated_at'>
@@ -368,7 +361,6 @@ export const DataService = {
     return newCharger;
   },
 
-  // 5. OWNER: UPDATE CHARGER
   async updateCharger(
     chargerId: string,
     ownerId: string,
@@ -408,7 +400,6 @@ export const DataService = {
     return chargers[index];
   },
 
-  // 6. DRIVER: CREATE BOOKING REQUEST
   async createBookingRequest(input: {
     charger_id: string;
     driver_id: string;
@@ -416,7 +407,6 @@ export const DataService = {
     duration_minutes: number;
     driver_note?: string;
   }): Promise<BookingRequest> {
-    // Validate future start time
     const start = new Date(input.requested_start).getTime();
     if (isNaN(start) || start <= Date.now()) {
       throw new Error('Requested start time must be in the future');
@@ -452,8 +442,12 @@ export const DataService = {
       throw new Error('Target charger not found');
     }
 
+    const profiles = LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
+    const driver = profiles.find(p => p.id === input.driver_id);
+    const owner = profiles.find(p => p.id === charger.owner_id);
+
     const newRequest: BookingRequest = {
-      id: 'req-' + Math.random().toString(36).substring(2, 9),
+      id: 'b-' + Math.random().toString(36).substring(2, 9),
       charger_id: input.charger_id,
       driver_id: input.driver_id,
       requested_start: input.requested_start,
@@ -462,7 +456,11 @@ export const DataService = {
       status: 'pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      charger,
+      charger: {
+        ...charger,
+        owner,
+      },
+      driver,
     };
 
     const requests = LocalStore.get<BookingRequest[]>(STORAGE_KEYS.REQUESTS, INITIAL_REQUESTS);
@@ -472,13 +470,12 @@ export const DataService = {
     return newRequest;
   },
 
-  // 7. DRIVER: GET OWN REQUESTS
   async getDriverRequests(driverId: string): Promise<BookingRequest[]> {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('booking_requests')
-          .select('*, charger:chargers(*)')
+          .select('*, charger:chargers(*, owner:profiles(display_name, phone)), driver:profiles(display_name, phone)')
           .eq('driver_id', driverId)
           .order('created_at', { ascending: false });
         if (!error && data) return data as BookingRequest[];
@@ -489,16 +486,21 @@ export const DataService = {
 
     const requests = LocalStore.get<BookingRequest[]>(STORAGE_KEYS.REQUESTS, INITIAL_REQUESTS);
     const chargers = LocalStore.get<Charger[]>(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS);
+    const profiles = LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
 
     return requests
       .filter(r => r.driver_id === driverId)
-      .map(r => ({
-        ...r,
-        charger: chargers.find(c => c.id === r.charger_id),
-      }));
+      .map(r => {
+        const charger = chargers.find(c => c.id === r.charger_id);
+        const owner = charger ? profiles.find(p => p.id === charger.owner_id) : undefined;
+        return {
+          ...r,
+          charger: charger ? { ...charger, owner } : undefined,
+          driver: profiles.find(p => p.id === r.driver_id),
+        };
+      });
   },
 
-  // 8. OWNER: GET REQUESTS FOR OWN CHARGERS
   async getOwnerRequests(ownerId: string): Promise<BookingRequest[]> {
     if (isSupabaseConfigured && supabase) {
       try {
@@ -528,7 +530,6 @@ export const DataService = {
       }));
   },
 
-  // 9. OWNER: APPROVE REQUEST
   async approveBookingRequest(
     requestId: string,
     ownerId: string,
@@ -536,7 +537,7 @@ export const DataService = {
   ): Promise<BookingRequest> {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase.rpc('approve_booking_request', {
+        const { error } = await supabase.rpc('approve_booking_request', {
           p_request_id: requestId,
           p_note: responseNote || null,
         });
@@ -551,6 +552,7 @@ export const DataService = {
 
     const requests = LocalStore.get<BookingRequest[]>(STORAGE_KEYS.REQUESTS, INITIAL_REQUESTS);
     const chargers = LocalStore.get<Charger[]>(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS);
+    const profiles = LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
 
     const index = requests.findIndex(r => r.id === requestId);
     if (index === -1) throw new Error('Request not found');
@@ -564,6 +566,8 @@ export const DataService = {
       throw new Error(`Cannot approve request in ${requests[index].status} status`);
     }
 
+    const owner = profiles.find(p => p.id === ownerId);
+
     requests[index] = {
       ...requests[index],
       status: 'approved',
@@ -571,14 +575,16 @@ export const DataService = {
       decided_by: ownerId,
       decided_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      charger,
+      charger: {
+        ...charger,
+        owner,
+      },
     };
 
     LocalStore.set(STORAGE_KEYS.REQUESTS, requests);
     return requests[index];
   },
 
-  // 10. OWNER: REJECT REQUEST
   async rejectBookingRequest(
     requestId: string,
     ownerId: string,
@@ -586,7 +592,7 @@ export const DataService = {
   ): Promise<BookingRequest> {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase.rpc('reject_booking_request', {
+        const { error } = await supabase.rpc('reject_booking_request', {
           p_request_id: requestId,
           p_note: responseNote || null,
         });
@@ -628,11 +634,10 @@ export const DataService = {
     return requests[index];
   },
 
-  // 11. DRIVER: CANCEL OWN REQUEST
   async cancelOwnRequest(requestId: string, driverId: string): Promise<BookingRequest> {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase.rpc('cancel_own_request', {
+        const { error } = await supabase.rpc('cancel_own_request', {
           p_request_id: requestId,
         });
         if (!error) {
@@ -666,19 +671,24 @@ export const DataService = {
     return requests[index];
   },
 
-  // 12. GET REQUEST BY ID HELPER
   async getRequestById(requestId: string): Promise<BookingRequest | null> {
     const requests = LocalStore.get<BookingRequest[]>(STORAGE_KEYS.REQUESTS, INITIAL_REQUESTS);
     const chargers = LocalStore.get<Charger[]>(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS);
+    const profiles = LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
+
     const req = requests.find(r => r.id === requestId);
     if (!req) return null;
+
+    const charger = chargers.find(c => c.id === req.charger_id);
+    const owner = charger ? profiles.find(p => p.id === charger.owner_id) : undefined;
+
     return {
       ...req,
-      charger: chargers.find(c => c.id === req.charger_id),
+      charger: charger ? { ...charger, owner } : undefined,
+      driver: profiles.find(p => p.id === req.driver_id),
     };
   },
 
-  // 13. SUPERADMIN: METRICS
   async getSuperadminMetrics(): Promise<SuperadminMetrics> {
     const users = LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
     const chargers = LocalStore.get<Charger[]>(STORAGE_KEYS.CHARGERS, INITIAL_CHARGERS);
@@ -693,7 +703,6 @@ export const DataService = {
     };
   },
 
-  // 14. SUPERADMIN: GET ALL DATA
   async getAllUsers(): Promise<Profile[]> {
     return LocalStore.get<Profile[]>(STORAGE_KEYS.PROFILES, INITIAL_PROFILES);
   },
@@ -719,7 +728,6 @@ export const DataService = {
     }));
   },
 
-  // 15. SUPERADMIN: MODERATE CHARGER (ACTIVATE/DEACTIVATE)
   async moderateCharger(
     chargerId: string,
     isActive: boolean,
@@ -750,7 +758,6 @@ export const DataService = {
 
     LocalStore.set(STORAGE_KEYS.CHARGERS, chargers);
 
-    // Record audit log
     const logs = LocalStore.get<AdminAuditLog[]>(STORAGE_KEYS.AUDIT_LOGS, []);
     logs.unshift({
       id: 'log-' + Math.random().toString(36).substring(2, 9),
@@ -766,7 +773,6 @@ export const DataService = {
     return chargers[index];
   },
 
-  // 16. SUPERADMIN: OVERRIDE REQUEST (e.g. CANCEL WITH REASON)
   async superadminCancelRequest(
     requestId: string,
     adminId: string,
@@ -787,7 +793,6 @@ export const DataService = {
 
     LocalStore.set(STORAGE_KEYS.REQUESTS, requests);
 
-    // Record audit log
     const logs = LocalStore.get<AdminAuditLog[]>(STORAGE_KEYS.AUDIT_LOGS, []);
     logs.unshift({
       id: 'log-' + Math.random().toString(36).substring(2, 9),

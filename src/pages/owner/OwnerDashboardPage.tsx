@@ -16,7 +16,9 @@ import {
   ArrowRight,
   MapPin,
   Calendar,
-  AlertTriangle,
+  Phone,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 export const OwnerDashboardPage: React.FC = () => {
@@ -24,6 +26,7 @@ export const OwnerDashboardPage: React.FC = () => {
   const [chargers, setChargers] = useState<Charger[]>([]);
   const [requests, setRequests] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
 
   // Approve / Reject modal state
   const [selectedReq, setSelectedReq] = useState<BookingRequest | null>(null);
@@ -73,22 +76,28 @@ export const OwnerDashboardPage: React.FC = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPhone(text);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-6 sm:space-y-8 pb-16 w-full max-w-full overflow-hidden">
       {/* Top Welcome & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight">
             Host Management Hub
           </h1>
-          <p className="text-sm text-[#66736D] mt-1">
+          <p className="text-xs sm:text-sm text-[#66736D] mt-1">
             Welcome back, {user?.display_name}. Monitor your stations and incoming driver requests.
           </p>
         </div>
 
         <Link
           to="/owner/chargers/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-semibold transition shadow-xs self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-xs sm:text-sm font-semibold transition shadow-xs self-start sm:self-auto min-h-[42px]"
         >
           <PlusCircle className="w-4 h-4 text-[#C8F169]" />
           <span>Add New Charger</span>
@@ -96,7 +105,7 @@ export const OwnerDashboardPage: React.FC = () => {
       </div>
 
       {/* 1. Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
         <MetricCard
           title="Active Listings"
           value={activeChargers.length}
@@ -121,11 +130,11 @@ export const OwnerDashboardPage: React.FC = () => {
       </div>
 
       {/* 2. Priority "Needs Your Attention" Section (WOW FACTOR) */}
-      <section className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
+      <section className="bg-white rounded-3xl border border-border p-4 sm:p-6 shadow-subtle space-y-4">
         <div className="flex items-center justify-between border-b border-border/80 pb-3">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
-            <h2 className="text-lg font-bold text-[#17231F]">Needs Your Attention</h2>
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            <h2 className="text-base sm:text-lg font-bold text-[#17231F]">Needs Your Attention</h2>
           </div>
           <Link
             to="/owner/requests"
@@ -149,14 +158,14 @@ export const OwnerDashboardPage: React.FC = () => {
                 key={req.id}
                 className="bg-[#F5F7F4] rounded-2xl p-4 border border-border/70 flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-[#17231F]">
+                <div className="space-y-1.5 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-sm text-[#17231F] truncate">
                       {req.charger?.name || 'Charging Bay'}
                     </span>
                     <RequestStatusBadge status={req.status} />
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#66736D]">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#66736D]">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-[#174D3A]" />
                       {new Date(req.requested_start).toLocaleString([], {
@@ -171,13 +180,37 @@ export const OwnerDashboardPage: React.FC = () => {
                       <Clock className="w-3.5 h-3.5 text-[#174D3A]" />
                       {req.duration_minutes} mins
                     </span>
-                    {req.driver?.display_name && (
-                      <>
-                        <span>•</span>
-                        <span>Driver: <strong>{req.driver.display_name}</strong></span>
-                      </>
-                    )}
                   </div>
+
+                  {/* DRIVER CONTACT INFORMATION (REQUIREMENT 2) */}
+                  {req.driver && (
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                      <span className="font-semibold text-[#17231F]">
+                        Driver: {req.driver.display_name}
+                      </span>
+                      {req.driver.phone && (
+                        <div className="inline-flex items-center gap-1.5 bg-white border border-border rounded-lg px-2.5 py-1 text-[11px] font-semibold text-[#174D3A]">
+                          <Phone className="w-3 h-3 text-[#174D3A]" />
+                          <a href={`tel:${req.driver.phone}`} className="hover:underline">
+                            {req.driver.phone}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(req.driver!.phone!)}
+                            className="text-gray-400 hover:text-gray-600 p-0.5"
+                            title="Copy phone"
+                          >
+                            {copiedPhone === req.driver.phone ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {req.driver_note && (
                     <p className="text-xs text-[#17231F] italic bg-white/80 p-2 rounded-lg mt-1">
                       "{req.driver_note}"
@@ -186,13 +219,13 @@ export const OwnerDashboardPage: React.FC = () => {
                 </div>
 
                 {/* Instant Decision Actions */}
-                <div className="flex items-center gap-2 self-end md:self-auto">
+                <div className="flex items-center gap-2 self-stretch sm:self-end md:self-auto justify-end">
                   <button
                     onClick={() => {
                       setSelectedReq(req);
                       setModalAction('reject');
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition min-h-[40px]"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     <span>Decline</span>
@@ -202,7 +235,7 @@ export const OwnerDashboardPage: React.FC = () => {
                       setSelectedReq(req);
                       setModalAction('approve');
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#174D3A] hover:bg-[#123D2E] transition shadow-xs"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#174D3A] hover:bg-[#123D2E] transition shadow-xs min-h-[40px]"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#C8F169]" />
                     <span>Approve Slot</span>
@@ -215,9 +248,9 @@ export const OwnerDashboardPage: React.FC = () => {
       </section>
 
       {/* 3. My Registered Chargers Summary */}
-      <section className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
+      <section className="bg-white rounded-3xl border border-border p-4 sm:p-6 shadow-subtle space-y-4">
         <div className="flex items-center justify-between border-b border-border/80 pb-3">
-          <h2 className="text-lg font-bold text-[#17231F]">My Charger Listings</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#17231F]">My Charger Listings</h2>
           <Link
             to="/owner/chargers"
             className="text-xs font-semibold text-[#174D3A] hover:underline flex items-center gap-1"
@@ -241,17 +274,17 @@ export const OwnerDashboardPage: React.FC = () => {
                 key={c.id}
                 className="bg-[#F5F7F4] rounded-2xl p-4 border border-border/70 flex items-start justify-between gap-3"
               >
-                <div>
-                  <h3 className="font-bold text-sm text-[#17231F]">{c.name}</h3>
-                  <div className="text-xs text-[#66736D] mt-0.5">{c.area || c.address}</div>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-sm text-[#17231F] truncate">{c.name}</h3>
+                  <div className="text-xs text-[#66736D] mt-0.5 truncate">{c.area || c.address}</div>
                   <div className="flex items-center gap-2 mt-2 text-xs font-semibold">
                     <span className="text-[#174D3A]">{c.power_kw} kW</span>
                     <span className="text-gray-300">•</span>
-                    <span>{c.connector_types.join(', ')}</span>
+                    <span className="truncate">{c.connector_types.join(', ')}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                   <ChargerStatusBadge status={c.availability_status} />
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -275,7 +308,9 @@ export const OwnerDashboardPage: React.FC = () => {
         title={modalAction === 'approve' ? 'Approve Driver Request?' : 'Decline Driver Request?'}
         message={
           modalAction === 'approve'
-            ? `Confirm charging reservation for ${selectedReq?.driver?.display_name || 'Driver'} at ${new Date(selectedReq?.requested_start || '').toLocaleString()}?`
+            ? `Confirm charging reservation for ${selectedReq?.driver?.display_name || 'Driver'} at ${new Date(
+                selectedReq?.requested_start || ''
+              ).toLocaleString()}?`
             : `Decline charging reservation request? You can supply an optional message for the driver.`
         }
         confirmLabel={

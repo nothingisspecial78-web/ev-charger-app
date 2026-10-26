@@ -44,8 +44,8 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-8 sm:py-12 space-y-6">
-      <div className="bg-white rounded-3xl border border-border p-6 sm:p-8 shadow-card space-y-6">
+    <div className="max-w-md mx-auto py-6 sm:py-12 px-3 sm:px-0 space-y-6">
+      <div className="bg-white rounded-3xl border border-border p-5 sm:p-8 shadow-card space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-[#174D3A] text-[#C8F169] flex items-center justify-center mx-auto shadow-sm">
             <Zap className="w-6 h-6 fill-current" />

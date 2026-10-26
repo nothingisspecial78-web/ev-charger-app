@@ -387,17 +387,17 @@ export const OwnerChargerFormPage: React.FC = () => {
         </div>
 
         {/* Action Button */}
-        <div className="flex gap-3 justify-end">
+        <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
           <Link
             to="/owner/chargers"
-            className="px-5 py-2.5 rounded-xl border border-border text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            className="w-full sm:w-auto text-center px-5 py-3 sm:py-2.5 rounded-xl border border-border text-sm font-semibold text-gray-700 hover:bg-gray-50 transition min-h-[44px] flex items-center justify-center"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={submitting}
-            className="px-6 py-2.5 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-semibold transition shadow-card flex items-center gap-2 disabled:opacity-60"
+            className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-semibold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60 min-h-[44px]"
           >
             <Save className="w-4 h-4 text-[#C8F169]" />
             <span>{submitting ? 'Saving...' : isEditing ? 'Update Listing' : 'Save & Publish Charger'}</span>

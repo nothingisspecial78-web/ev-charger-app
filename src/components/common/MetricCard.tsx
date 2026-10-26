@@ -15,16 +15,16 @@ export const MetricCard: React.FC<{
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-border p-5 shadow-subtle hover:shadow-card transition flex flex-col justify-between">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[#66736D]">{title}</span>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${accentStyles[accentColor]}`}>
+    <div className="bg-white rounded-2xl border border-border p-3.5 sm:p-5 shadow-subtle hover:shadow-card transition flex flex-col justify-between min-w-0">
+      <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+        <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#66736D] truncate">{title}</span>
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl flex items-center justify-center ${accentStyles[accentColor]}`}>
           {icon}
         </div>
       </div>
-      <div>
-        <div className="text-3xl font-extrabold text-[#17231F] tracking-tight">{value}</div>
-        {subtitle && <p className="text-xs text-[#66736D] mt-1">{subtitle}</p>}
+      <div className="min-w-0">
+        <div className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight truncate">{value}</div>
+        {subtitle && <p className="text-[11px] sm:text-xs text-[#66736D] mt-0.5 sm:mt-1 truncate">{subtitle}</p>}
       </div>
     </div>
   );

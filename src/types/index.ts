@@ -44,6 +44,7 @@ export interface Charger {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  distanceKm?: number;
   owner?: Pick<Profile, 'display_name' | 'phone'>;
 }
 
@@ -82,7 +83,8 @@ export interface ChargerFilters {
   connector?: ConnectorType | 'all';
   minPower?: number | 'all';
   status?: AvailabilityStatus | 'all';
-  sortBy?: 'power_desc' | 'power_asc' | 'price_asc' | 'name_asc';
+  sortBy?: 'nearest' | 'power_desc' | 'power_asc' | 'price_asc' | 'name_asc';
+  userCoords?: { latitude: number; longitude: number };
 }
 
 export interface SuperadminMetrics {

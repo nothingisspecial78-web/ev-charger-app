@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, LogIn, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { Zap, LogIn, Sparkles, AlertCircle, Shield, Check } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -21,10 +21,11 @@ export const LoginPage: React.FC = () => {
       if (!res.success) {
         setError(res.error || 'Invalid credentials');
       } else {
-        if (email.includes('owner') || email.includes('admin')) {
-          navigate('/owner');
-        } else if (email.includes('superadmin')) {
+        const cleanEmail = email.toLowerCase().trim();
+        if (cleanEmail === 'nothingisspecial78@gmail.com' || cleanEmail.includes('superadmin')) {
           navigate('/superadmin');
+        } else if (cleanEmail.includes('owner') || cleanEmail.includes('admin')) {
+          navigate('/owner');
         } else {
           navigate('/chargers');
         }
@@ -36,7 +37,9 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickDemo = (role: 'driver' | 'admin' | 'superadmin') => {
+  const handleQuickFill = (targetEmail: string, targetPass: string, role: 'driver' | 'admin' | 'superadmin') => {
+    setEmail(targetEmail);
+    setPassword(targetPass);
     switchDemoRole(role);
     if (role === 'admin') navigate('/owner');
     else if (role === 'superadmin') navigate('/superadmin');
@@ -44,9 +47,9 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-8 sm:py-12 space-y-6">
+    <div className="max-w-md mx-auto py-6 sm:py-12 px-3 sm:px-0 space-y-6">
       {/* Brand card */}
-      <div className="bg-white rounded-3xl border border-border p-6 sm:p-8 shadow-card space-y-6">
+      <div className="bg-white rounded-3xl border border-border p-5 sm:p-8 shadow-card space-y-5">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-[#174D3A] text-[#C8F169] flex items-center justify-center mx-auto shadow-sm">
             <Zap className="w-6 h-6 fill-current" />
@@ -55,7 +58,7 @@ export const LoginPage: React.FC = () => {
             Sign in to VoltSpot
           </h1>
           <p className="text-xs text-[#66736D]">
-            Access driver discovery, charger hosting, and session requests.
+            Access driver discovery, charger hosting, or platform oversight.
           </p>
         </div>
 
@@ -75,9 +78,9 @@ export const LoginPage: React.FC = () => {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="e.g. driver@voltspot.demo"
+              placeholder="e.g. nothingisspecial78@gmail.com"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[42px]"
             />
           </div>
 
@@ -91,48 +94,52 @@ export const LoginPage: React.FC = () => {
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[42px]"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-bold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60"
+            className="w-full py-3 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-bold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60 min-h-[44px]"
           >
             <LogIn className="w-4 h-4 text-[#C8F169]" />
             <span>{submitting ? 'Authenticating...' : 'Sign In'}</span>
           </button>
         </form>
 
-        {/* 1-Click Quick Demo Personas */}
-        <div className="pt-4 border-t border-border space-y-2">
+        {/* 1-Click Quick Demo Personas with specific superadmin credentials */}
+        <div className="pt-4 border-t border-border space-y-2.5">
           <div className="text-[11px] font-bold text-[#66736D] uppercase tracking-wider text-center flex items-center justify-center gap-1">
             <Sparkles className="w-3 h-3 text-[#174D3A]" />
-            <span>One-Click Hackathon Personas</span>
+            <span>One-Click Sign In Personas</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
-              onClick={() => handleQuickDemo('driver')}
-              className="py-2 px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition"
+              onClick={() => handleQuickFill('driver@voltspot.demo', 'Driver123!', 'driver')}
+              className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[38px]"
             >
               Driver
             </button>
             <button
               type="button"
-              onClick={() => handleQuickDemo('admin')}
-              className="py-2 px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition"
+              onClick={() => handleQuickFill('owner@voltspot.demo', 'Owner123!', 'admin')}
+              className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[38px]"
             >
               Host
             </button>
             <button
               type="button"
-              onClick={() => handleQuickDemo('superadmin')}
-              className="py-2 px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition"
+              onClick={() => handleQuickFill('nothingisspecial78@gmail.com', 'abdu@1027', 'superadmin')}
+              className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-bold bg-[#EAF3EF] text-[#174D3A] hover:bg-[#C8F169]/30 border border-[#C5DED3] transition min-h-[38px] flex items-center justify-center gap-1"
             >
-              Admin
+              <Shield className="w-3 h-3 text-[#174D3A]" />
+              <span>Admin</span>
             </button>
+          </div>
+          <div className="text-[11px] text-[#66736D] text-center bg-gray-50 p-2 rounded-lg">
+            Superadmin: <span className="font-mono text-[#17231F]">nothingisspecial78@gmail.com</span>
           </div>
         </div>
 

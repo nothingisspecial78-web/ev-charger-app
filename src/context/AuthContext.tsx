@@ -19,23 +19,23 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Demo profile references from seed.sql
-const DEMO_USERS: Record<UserRole, Profile> = {
+// Fictional realistic demo profile references with valid hexadecimal UUIDs
+export const DEMO_USERS: Record<UserRole, Profile> = {
   driver: {
-    id: 'd1111111-1111-1111-1111-111111111111',
+    id: 'd1111111-1111-4111-8111-111111111111',
     display_name: 'Rahul Driver',
     role: 'driver',
     phone: '+91 98765 43210',
   },
   admin: {
-    id: 'a2222222-2222-2222-2222-222222222222',
+    id: 'a2222222-2222-4222-8222-222222222222',
     display_name: 'Kiran (Host & Charger Owner)',
     role: 'admin',
     phone: '+91 98450 12345',
   },
   superadmin: {
-    id: 's3333333-3333-3333-3333-333333333333',
-    display_name: 'Ananya (Platform Superadmin)',
+    id: 'e3333333-3333-4333-8333-333333333333',
+    display_name: 'Abdulla (Platform Superadmin)',
     role: 'superadmin',
     phone: '+91 94470 99999',
   },
@@ -45,7 +45,6 @@ const AUTH_STORAGE_KEY = 'voltspot_active_user';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<Profile | null>(() => {
-    // Check saved session in localStorage
     try {
       const saved = localStorage.getItem(AUTH_STORAGE_KEY);
       if (saved) return JSON.parse(saved);
@@ -79,20 +78,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, _pass: string) => {
+  const login = async (email: string, pass: string) => {
     setLoading(true);
     try {
       const cleanEmail = email.toLowerCase().trim();
+
+      // Check for Superadmin specified credentials: nothingisspecial78@gmail.com / abdu@1027
+      if (
+        cleanEmail === 'nothingisspecial78@gmail.com' ||
+        cleanEmail.includes('superadmin') ||
+        cleanEmail.includes('super')
+      ) {
+        if (cleanEmail === 'nothingisspecial78@gmail.com' && pass && pass !== 'abdu@1027') {
+          return { success: false, error: 'Incorrect password for superadmin account' };
+        }
+        setUser(DEMO_USERS.superadmin);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.superadmin));
+        return { success: true };
+      }
 
       // Demo quick accounts detection
       if (cleanEmail.includes('owner') || cleanEmail.includes('admin@voltspot')) {
         setUser(DEMO_USERS.admin);
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.admin));
-        return { success: true };
-      }
-      if (cleanEmail.includes('superadmin') || cleanEmail.includes('super')) {
-        setUser(DEMO_USERS.superadmin);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.superadmin));
         return { success: true };
       }
       if (cleanEmail.includes('driver')) {
@@ -105,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isSupabaseConfigured && supabase) {
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
-          password: _pass,
+          password: pass,
         });
         if (error) throw error;
         if (data.user) {
