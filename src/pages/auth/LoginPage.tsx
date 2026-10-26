@@ -37,13 +37,9 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickFill = (targetEmail: string, targetPass: string, role: 'driver' | 'admin' | 'superadmin') => {
+  const handleFillCredentials = (targetEmail: string, targetPass: string) => {
     setEmail(targetEmail);
     setPassword(targetPass);
-    switchDemoRole(role);
-    if (role === 'admin') navigate('/owner');
-    else if (role === 'superadmin') navigate('/superadmin');
-    else navigate('/chargers');
   };
 
   return (
@@ -104,34 +100,34 @@ export const LoginPage: React.FC = () => {
             className="w-full py-3 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-bold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60 min-h-[44px]"
           >
             <LogIn className="w-4 h-4 text-[#C8F169]" />
-            <span>{submitting ? 'Authenticating...' : 'Sign In'}</span>
+            <span>{submitting ? 'Authenticating with Supabase...' : 'Sign In'}</span>
           </button>
         </form>
 
-        {/* 1-Click Quick Demo Personas with specific superadmin credentials */}
+        {/* Quick credential chips */}
         <div className="pt-4 border-t border-border space-y-2.5">
           <div className="text-[11px] font-bold text-[#66736D] uppercase tracking-wider text-center flex items-center justify-center gap-1">
             <Sparkles className="w-3 h-3 text-[#174D3A]" />
-            <span>One-Click Sign In Personas</span>
+            <span>Fill Seed Credentials</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
-              onClick={() => handleQuickFill('driver@voltspot.demo', 'Driver123!', 'driver')}
+              onClick={() => handleFillCredentials('driver@voltspot.demo', 'Driver123!')}
               className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[38px]"
             >
               Driver
             </button>
             <button
               type="button"
-              onClick={() => handleQuickFill('owner@voltspot.demo', 'Owner123!', 'admin')}
+              onClick={() => handleFillCredentials('owner@voltspot.demo', 'Owner123!')}
               className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-semibold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[38px]"
             >
               Host
             </button>
             <button
               type="button"
-              onClick={() => handleQuickFill('nothingisspecial78@gmail.com', 'abdu@1027', 'superadmin')}
+              onClick={() => handleFillCredentials('nothingisspecial78@gmail.com', 'abdu@1027')}
               className="py-2 px-1 sm:px-2 rounded-xl text-center text-xs font-bold bg-[#EAF3EF] text-[#174D3A] hover:bg-[#C8F169]/30 border border-[#C5DED3] transition min-h-[38px] flex items-center justify-center gap-1"
             >
               <Shield className="w-3 h-3 text-[#174D3A]" />

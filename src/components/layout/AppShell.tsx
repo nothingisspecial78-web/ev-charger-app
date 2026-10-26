@@ -75,73 +75,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F7F4] text-[#17231F] w-full overflow-x-hidden">
-      {/* 1. Quick Demo Switcher Bar - Fully Responsive */}
-      <div className="bg-[#174D3A] text-white py-1.5 px-3 sm:px-4 text-xs font-medium border-b border-[#123D2E] flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 shadow-xs">
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C8F169] text-[#174D3A] font-extrabold text-[10px] sm:text-[11px] flex-shrink-0">
-            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />
-            DEMO
-          </span>
-          <span className="text-gray-300 text-[11px] hidden md:inline">Persona:</span>
-          <span className="font-bold text-[#C8F169] text-[11px] sm:text-xs truncate max-w-[150px] sm:max-w-none">
-            {user?.display_name?.split(' ')[0] || 'Guest'} ({user?.role?.toUpperCase()})
-          </span>
-        </div>
-
-        {/* Persona quick switch buttons */}
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-          <button
-            onClick={() => {
-              switchDemoRole('driver');
-              navigate('/chargers');
-            }}
-            className={`px-2 py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition whitespace-nowrap min-h-[28px] ${
-              user?.role === 'driver'
-                ? 'bg-[#C8F169] text-[#174D3A] shadow-xs'
-                : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            Driver (Rahul)
-          </button>
-          <button
-            onClick={() => {
-              switchDemoRole('admin');
-              navigate('/owner');
-            }}
-            className={`px-2 py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition whitespace-nowrap min-h-[28px] ${
-              user?.role === 'admin'
-                ? 'bg-[#C8F169] text-[#174D3A] shadow-xs'
-                : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            Host (Kiran)
-          </button>
-          <button
-            onClick={() => {
-              switchDemoRole('superadmin');
-              navigate('/superadmin');
-            }}
-            className={`px-2 py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition whitespace-nowrap min-h-[28px] ${
-              user?.role === 'superadmin'
-                ? 'bg-[#C8F169] text-[#174D3A] shadow-xs'
-                : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            Superadmin (Abdulla)
-          </button>
-
-          <button
-            onClick={handleResetData}
-            disabled={resetting}
-            title="Reset demo data"
-            className="ml-1 text-[10px] text-gray-300 hover:text-white underline whitespace-nowrap"
-          >
-            {resetting ? 'Reset...' : 'Reset'}
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Top Navigation Bar */}
+      {/* Top Navigation Bar - Functional Mode */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-border shadow-xs">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand Wordmark */}

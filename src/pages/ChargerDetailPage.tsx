@@ -357,40 +357,59 @@ export const ChargerDetailPage: React.FC = () => {
                 <ExternalLink className="w-3 h-3 opacity-80" />
               </a>
 
-              {/* Fast Track switch */}
-              <div className="bg-[#EAF3EF] border border-[#C5DED3] rounded-2xl p-3.5 space-y-2">
+              {/* Functional Booking Confirmation */}
+              <div className="bg-[#EAF3EF] border border-[#C5DED3] rounded-2xl p-4 space-y-2">
                 <div className="font-bold text-xs text-[#174D3A] flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 fill-current" />
-                  <span>Test Owner Decision Flow</span>
+                  <CheckCircle2 className="w-4 h-4 fill-current" />
+                  <span>Request Sent to Station Host</span>
                 </div>
                 <p className="text-xs text-[#17231F] leading-relaxed">
-                  Switch to host account (Kiran) to approve this session immediately!
+                  The host has been notified. You can monitor confirmation status and get turn-by-turn navigation once approved.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    switchDemoRole('admin');
-                    navigate('/owner/requests');
-                  }}
-                  className="w-full py-2 px-3 bg-[#174D3A] text-white rounded-xl text-xs font-bold hover:bg-[#123D2E] transition shadow-xs"
-                >
-                  Switch to Host & Approve →
-                </button>
               </div>
 
               <div className="flex gap-2">
                 <Link
                   to="/my-requests"
-                  className="flex-1 py-2.5 px-3 text-center rounded-xl bg-white border border-border text-xs font-semibold text-[#17231F] hover:bg-gray-50 transition"
+                  className="flex-1 py-3 px-3 text-center rounded-xl bg-[#174D3A] text-white text-xs font-semibold hover:bg-[#123D2E] transition shadow-xs flex items-center justify-center min-h-[44px]"
                 >
-                  My Requests
+                  View My Requests
                 </Link>
                 <button
                   onClick={() => setCreatedRequest(null)}
-                  className="py-2.5 px-3 rounded-xl text-xs font-semibold text-[#66736D] hover:underline"
+                  className="py-3 px-4 rounded-xl text-xs font-semibold text-[#66736D] bg-white border border-border hover:bg-gray-50 min-h-[44px]"
                 >
-                  New Request
+                  Book Again
                 </button>
+              </div>
+            </div>
+          ) : !user ? (
+            /* Guest Prompt: Sign in to request */
+            <div className="bg-white rounded-3xl border border-border p-5 sm:p-8 shadow-card space-y-5 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EF] text-[#174D3A] flex items-center justify-center mx-auto">
+                <Zap className="w-6 h-6 fill-current" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-extrabold text-[#17231F]">
+                  Sign In to Reserve Station
+                </h2>
+                <p className="text-xs text-[#66736D] mt-1.5 leading-relaxed">
+                  Sign in or create a driver account to send a slot reservation request to this host.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 pt-2">
+                <Link
+                  to="/login"
+                  className="w-full py-3 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white font-bold text-xs sm:text-sm transition shadow-card flex items-center justify-center min-h-[44px]"
+                >
+                  Sign In to Reserve
+                </Link>
+                <Link
+                  to="/signup"
+                  className="w-full py-3 px-4 rounded-xl bg-white hover:bg-gray-50 border border-border text-[#17231F] font-semibold text-xs sm:text-sm transition flex items-center justify-center min-h-[44px]"
+                >
+                  Create New Account
+                </Link>
               </div>
             </div>
           ) : (

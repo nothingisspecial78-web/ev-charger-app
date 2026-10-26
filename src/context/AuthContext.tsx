@@ -51,8 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // fallback
     }
-    // Default to seeded demo driver for instant discovery preview
-    return DEMO_USERS.driver;
+    return null;
   });
 
   const [loading, setLoading] = useState(false);
@@ -60,13 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (isSupabaseConfigured && supabase) {
       const client = supabase;
+
+      // 1. Load active session on start
       client.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           client
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single()
+            .maybeSingle()
             .then(({ data }) => {
               if (data) {
                 setUser(data as Profile);
@@ -75,6 +76,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
         }
       });
+
+      // 2. Real-time auth state synchronization
+      const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_OUT' || !session?.user) {
+          setUser(null);
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        } else if (session?.user) {
+          const { data: prof } = await client
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (prof) {
+            setUser(prof as Profile);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(prof));
+          } else {
+            const fallbackProf: Profile = {
+              id: session.user.id,
+              display_name: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'User',
+              role: (session.user.user_metadata?.role as UserRole) || 'driver',
+              phone: session.user.user_metadata?.phone,
+            };
+            setUser(fallbackProf);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(fallbackProf));
+          }
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
     }
   }, []);
 
@@ -83,62 +116,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const cleanEmail = email.toLowerCase().trim();
 
-      // Check for Superadmin specified credentials: nothingisspecial78@gmail.com / abdu@1027
-      if (
-        cleanEmail === 'nothingisspecial78@gmail.com' ||
-        cleanEmail.includes('superadmin') ||
-        cleanEmail.includes('super')
-      ) {
-        if (cleanEmail === 'nothingisspecial78@gmail.com' && pass && pass !== 'abdu@1027') {
-          return { success: false, error: 'Incorrect password for superadmin account' };
-        }
-        setUser(DEMO_USERS.superadmin);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.superadmin));
-        return { success: true };
-      }
-
-      // Demo quick accounts detection
-      if (cleanEmail.includes('owner') || cleanEmail.includes('admin@voltspot')) {
-        setUser(DEMO_USERS.admin);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.admin));
-        return { success: true };
-      }
-      if (cleanEmail.includes('driver')) {
-        setUser(DEMO_USERS.driver);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.driver));
-        return { success: true };
-      }
-
-      // If Supabase is connected
+      // Real Supabase Authentication (Functional Mode)
       if (isSupabaseConfigured && supabase) {
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password: pass,
         });
-        if (error) throw error;
+
+        if (error) {
+          return { success: false, error: error.message };
+        }
+
         if (data.user) {
           const { data: prof } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', data.user.id)
-            .single();
+            .maybeSingle();
+
           if (prof) {
             setUser(prof as Profile);
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(prof));
+            return { success: true };
+          } else {
+            const newProf: Profile = {
+              id: data.user.id,
+              display_name: data.user.user_metadata?.display_name || cleanEmail.split('@')[0],
+              role: (data.user.user_metadata?.role as UserRole) || 'driver',
+              phone: data.user.user_metadata?.phone,
+            };
+            await supabase.from('profiles').upsert(newProf);
+            setUser(newProf);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newProf));
             return { success: true };
           }
         }
       }
 
-      // Standard fallback user
-      const customUser: Profile = {
-        id: 'u-' + Math.random().toString(36).substring(2, 9),
-        display_name: cleanEmail.split('@')[0],
-        role: 'driver',
-      };
-      setUser(customUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(customUser));
-      return { success: true };
+      // Offline fallback only when Supabase is disconnected
+      if (cleanEmail === 'nothingisspecial78@gmail.com') {
+        if (pass !== 'abdu@1027') return { success: false, error: 'Incorrect password' };
+        setUser(DEMO_USERS.superadmin);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.superadmin));
+        return { success: true };
+      }
+
+      return { success: false, error: 'Supabase authentication service unavailable' };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Login failed' };
     } finally {
@@ -155,7 +178,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ) => {
     setLoading(true);
     try {
-      // Security rule: never permit superadmin self-registration
       const safeRole: UserRole = role === 'admin' ? 'admin' : 'driver';
 
       if (isSupabaseConfigured && supabase) {
@@ -170,7 +192,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
           },
         });
-        if (error) throw error;
+
+        if (error) {
+          return { success: false, error: error.message };
+        }
+
         if (data.user) {
           const newProfile: Profile = {
             id: data.user.id,
@@ -178,22 +204,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: safeRole,
             phone: phone?.trim(),
           };
+
+          await supabase.from('profiles').upsert(newProfile);
           setUser(newProfile);
           localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newProfile));
           return { success: true };
         }
       }
 
-      // Local persistent registration
-      const newProfile: Profile = {
-        id: 'u-' + Math.random().toString(36).substring(2, 9),
-        display_name: name.trim(),
-        role: safeRole,
-        phone: phone?.trim(),
-      };
-      setUser(newProfile);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newProfile));
-      return { success: true };
+      return { success: false, error: 'Unable to connect to registration service' };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Signup failed' };
     } finally {
