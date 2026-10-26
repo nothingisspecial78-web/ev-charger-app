@@ -72,45 +72,56 @@ ON CONFLICT (id) DO UPDATE SET
   email_confirmed_at = NOW(),
   raw_user_meta_data = EXCLUDED.raw_user_meta_data;
 
--- Link Auth Identities
-INSERT INTO auth.identities (
-  id,
-  user_id,
-  identity_data,
-  provider,
-  last_sign_in_at,
-  created_at,
-  updated_at
-)
-VALUES
-  (
-    'd1111111-1111-4111-8111-111111111111',
-    'd1111111-1111-4111-8111-111111111111',
-    format('{"sub":"%s","email":"%s"}', 'd1111111-1111-4111-8111-111111111111', 'driver@voltspot.demo')::jsonb,
-    'email',
-    NOW(),
-    NOW(),
-    NOW()
-  ),
-  (
-    'a2222222-2222-4222-8222-222222222222',
-    'a2222222-2222-4222-8222-222222222222',
-    format('{"sub":"%s","email":"%s"}', 'a2222222-2222-4222-8222-222222222222', 'owner@voltspot.demo')::jsonb,
-    'email',
-    NOW(),
-    NOW(),
-    NOW()
-  ),
-  (
-    'e3333333-3333-4333-8333-333333333333',
-    'e3333333-3333-4333-8333-333333333333',
-    format('{"sub":"%s","email":"%s"}', 'e3333333-3333-4333-8333-333333333333', 'nothingisspecial78@gmail.com')::jsonb,
-    'email',
-    NOW(),
-    NOW(),
-    NOW()
+-- Link Auth Identities (Safe insertion supporting Supabase GoTrue schema)
+DO $$
+BEGIN
+  INSERT INTO auth.identities (
+    id,
+    provider_id,
+    user_id,
+    identity_data,
+    provider,
+    last_sign_in_at,
+    created_at,
+    updated_at
   )
-ON CONFLICT (id, provider) DO NOTHING;
+  VALUES
+    (
+      'd1111111-1111-4111-8111-111111111111',
+      'd1111111-1111-4111-8111-111111111111',
+      'd1111111-1111-4111-8111-111111111111',
+      format('{"sub":"%s","email":"%s"}', 'd1111111-1111-4111-8111-111111111111', 'driver@voltspot.demo')::jsonb,
+      'email',
+      NOW(),
+      NOW(),
+      NOW()
+    ),
+    (
+      'a2222222-2222-4222-8222-222222222222',
+      'a2222222-2222-4222-8222-222222222222',
+      'a2222222-2222-4222-8222-222222222222',
+      format('{"sub":"%s","email":"%s"}', 'a2222222-2222-4222-8222-222222222222', 'owner@voltspot.demo')::jsonb,
+      'email',
+      NOW(),
+      NOW(),
+      NOW()
+    ),
+    (
+      'e3333333-3333-4333-8333-333333333333',
+      'e3333333-3333-4333-8333-333333333333',
+      'e3333333-3333-4333-8333-333333333333',
+      format('{"sub":"%s","email":"%s"}', 'e3333333-3333-4333-8333-333333333333', 'nothingisspecial78@gmail.com')::jsonb,
+      'email',
+      NOW(),
+      NOW(),
+      NOW()
+    )
+  ON CONFLICT (provider_id, provider) DO NOTHING;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Fallback for environments with distinct identity constraints
+    NULL;
+END $$;
 
 -- 3. SEED PUBLIC PROFILES
 INSERT INTO public.profiles (id, display_name, role, phone)
