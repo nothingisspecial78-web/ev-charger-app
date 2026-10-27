@@ -17,7 +17,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
   selectedCharger,
   onSelectCharger,
   userCoords,
-  className = 'h-[460px] w-full rounded-2xl',
+  className = 'h-[480px] w-full rounded-2xl',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -63,7 +63,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
     Object.values(markersRef.current).forEach(marker => marker.remove());
     markersRef.current = {};
 
-    // 1. Add User Location Marker if available
+    // 1. Add User Location Marker with radar ping
     if (userMarkerRef.current) {
       userMarkerRef.current.remove();
       userMarkerRef.current = null;
@@ -74,8 +74,8 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
         className: 'user-location-marker',
         html: `
           <div class="relative flex items-center justify-center w-8 h-8">
-            <span class="absolute w-8 h-8 rounded-full bg-blue-500 opacity-40 animate-ping"></span>
-            <span class="relative w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-md"></span>
+            <span class="absolute w-8 h-8 rounded-full bg-emerald-500 opacity-30 animate-ping"></span>
+            <span class="relative w-4 h-4 rounded-full bg-[#174D3A] border-2 border-[#C8F169] shadow-lg"></span>
           </div>
         `,
         iconSize: [32, 32],
@@ -86,7 +86,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
         icon: userIcon,
       })
         .addTo(map)
-        .bindPopup('<div class="font-bold text-xs p-1">📍 You Are Here</div>');
+        .bindPopup('<div class="font-bold text-xs p-1">📍 You Are Here (Kozhikode GPS)</div>');
     }
 
     // 2. Add Charger Markers
@@ -103,46 +103,60 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
       const dist = userCoords ? calculateDistanceKm(userCoords.latitude, userCoords.longitude, lat, lng) : null;
       const drivingMins = dist ? estimateDrivingMinutes(dist) : null;
       const navUrl = getGoogleMapsNavUrl(lat, lng, charger.address);
+      const isSelected = selectedCharger?.id === charger.id;
+
+      const markerColor =
+        charger.availability_status === 'busy'
+          ? 'bg-amber-600'
+          : charger.availability_status === 'offline'
+          ? 'bg-gray-600'
+          : 'bg-[#174D3A]';
 
       const customIcon = L.divIcon({
         className: 'volt-custom-marker',
         html: `
-          <div class="volt-map-pin ${
-            charger.availability_status === 'busy'
-              ? 'bg-amber-600'
-              : charger.availability_status === 'offline'
-              ? 'bg-gray-600'
-              : 'bg-[#174D3A]'
-          }">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
+          <div class="relative flex items-center justify-center">
+            ${isSelected ? '<span class="volt-radar-ring"></span>' : ''}
+            <div class="volt-map-pin ${markerColor}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
           </div>
         `,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
-        popupAnchor: [0, -20],
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -22],
       });
 
       const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
 
-      // Popup Content
+      // Popup Content with modern luxury styling
       const popupContent = document.createElement('div');
-      popupContent.className = 'p-1 font-sans text-xs min-w-[200px]';
+      popupContent.className = 'p-1 font-sans text-xs min-w-[210px] space-y-1.5';
       popupContent.innerHTML = `
-        <div class="font-bold text-sm text-[#17231F] leading-tight">${charger.name}</div>
-        <div class="text-[#66736D] mt-0.5 text-[11px]">${charger.area || charger.address}</div>
+        <div class="flex items-center justify-between gap-2">
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+            charger.power_kw >= 50 ? 'bg-[#174D3A] text-[#C8F169]' : 'bg-gray-100 text-gray-800'
+          }">
+            ⚡ ${charger.power_kw} kW
+          </span>
+          <span class="text-[10px] font-bold text-gray-700">
+            ${charger.price_per_kwh ? `₹${charger.price_per_kwh}/kWh` : 'Free'}
+          </span>
+        </div>
+
+        <div class="font-extrabold text-sm text-[#17231F] leading-tight pt-1">${charger.name}</div>
+        <div class="text-[#66736D] text-[11px] leading-tight">${charger.area || charger.address}</div>
         
-        <div class="flex items-center gap-2 mt-2 font-semibold">
-          <span class="text-[#174D3A]">${charger.power_kw} kW</span>
-          <span class="text-gray-300">•</span>
-          <span>${charger.connector_types.join(', ')}</span>
+        <div class="flex items-center gap-1.5 text-[11px] text-[#174D3A] font-semibold">
+          <span>Plugs: ${charger.connector_types.join(', ')}</span>
         </div>
 
         ${
           dist !== null
             ? `
-          <div class="bg-blue-50 border border-blue-200 text-blue-900 rounded-lg p-1.5 mt-2 text-[11px] font-semibold flex items-center justify-between">
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg p-1.5 text-[11px] font-bold flex items-center justify-between">
             <span>🚗 ~${dist.toFixed(1)} km away</span>
             <span>~${drivingMins} mins</span>
           </div>
@@ -150,12 +164,12 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
             : ''
         }
 
-        <div class="grid grid-cols-2 gap-1.5 mt-2.5">
-          <button id="view-charger-${charger.id}" class="py-1.5 px-2 bg-[#174D3A] text-white rounded-lg font-bold text-center hover:bg-[#123D2E] transition text-[11px]">
+        <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-gray-100">
+          <button id="view-charger-${charger.id}" class="py-2 px-2.5 bg-[#174D3A] text-white rounded-lg font-bold text-center hover:bg-[#123D2E] transition text-[11px] shadow-sm">
             Request Slot
           </button>
-          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="py-1.5 px-2 bg-blue-600 text-white rounded-lg font-bold text-center hover:bg-blue-700 transition text-[11px] flex items-center justify-center gap-1">
-            Google Maps
+          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2 bg-white border border-gray-300 text-gray-800 rounded-lg font-bold text-center hover:bg-gray-50 transition text-[11px] flex items-center justify-center gap-1">
+            Google Maps ↗
           </a>
         </div>
       `;
@@ -175,7 +189,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
     if (geoChargers.length > 0 && !selectedCharger) {
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
     }
-  }, [chargers, navigate, onSelectCharger, userCoords]);
+  }, [chargers, navigate, onSelectCharger, userCoords, selectedCharger]);
 
   // Route drawing when charger is selected
   useEffect(() => {
@@ -193,7 +207,6 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
       const chargerLng = selectedCharger.longitude;
 
       if (userCoords) {
-        // Draw dashed route line from user to destination
         const latlngs: [number, number][] = [
           [userCoords.latitude, userCoords.longitude],
           [chargerLat, chargerLng],
@@ -203,7 +216,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
           color: '#174D3A',
           weight: 4,
           dashArray: '8, 8',
-          opacity: 0.8,
+          opacity: 0.85,
         }).addTo(map);
 
         const routeBounds = L.latLngBounds(latlngs);
@@ -222,9 +235,9 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
   return (
     <div className={`relative overflow-hidden border border-border shadow-card ${className}`}>
       <div ref={mapContainerRef} className="h-full w-full z-0" />
-      <div className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-border shadow-xs text-[10px] sm:text-[11px] font-semibold text-[#17231F] flex items-center gap-1.5">
-        <span className="w-2 h-2 rounded-full bg-[#174D3A]" />
-        <span>OpenStreetMap Live</span>
+      <div className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-border shadow-sm text-xs font-bold text-[#17231F] flex items-center gap-2">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+        <span>OpenStreetMap Live Network</span>
       </div>
     </div>
   );
