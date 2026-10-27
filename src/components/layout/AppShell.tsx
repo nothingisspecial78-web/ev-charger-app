@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types';
 import {
   Zap,
   MapPin,
@@ -16,30 +15,16 @@ import {
   Users,
   Sparkles,
   ChevronRight,
-  ShieldCheck,
-  UserCheck,
+  User,
 } from 'lucide-react';
-import { DataService } from '@/services/dataService';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, logout, switchDemoRole } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
-  const [resetting, setResetting] = useState(false);
 
   const isOwnerRoute = location.pathname.startsWith('/owner');
   const isSuperadminRoute = location.pathname.startsWith('/superadmin');
-
-  const handleResetData = () => {
-    setResetting(true);
-    DataService.resetDemoData();
-    setTimeout(() => {
-      setResetting(false);
-      window.location.reload();
-    }, 400);
-  };
 
   const navLinks = [
     { name: 'Discover Chargers', path: '/chargers', icon: MapPin, show: true },
@@ -47,7 +32,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       name: 'My Booking Requests',
       path: '/my-requests',
       icon: CalendarCheck2,
-      show: user?.role === 'driver' || user?.role === 'admin' || user?.role === 'superadmin',
+      show: Boolean(user),
     },
     {
       name: 'Host Dashboard',
@@ -79,61 +64,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F7F4] text-[#17231F] w-full overflow-x-hidden selection:bg-[#C8F169] selection:text-[#17231F]">
-      {/* Top Demo Banner for fast evaluator role toggling */}
-      <div className="bg-[#174D3A] text-white text-xs px-3 sm:px-6 py-1.5 flex items-center justify-between border-b border-[#123D2E] z-50">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <span className="flex h-2 w-2 relative flex-shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C8F169] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C8F169]"></span>
-          </span>
-          <span className="font-semibold truncate">VoltSpot MVP Demo System</span>
-          <span className="hidden sm:inline text-gray-300">• Switch roles instantly:</span>
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => switchDemoRole('driver')}
-            className={`px-2 py-0.5 rounded text-[11px] font-bold transition ${
-              user?.role === 'driver'
-                ? 'bg-[#C8F169] text-[#17231F] shadow-xs'
-                : 'bg-white/10 text-gray-200 hover:bg-white/20'
-            }`}
-          >
-            🚗 Driver
-          </button>
-          <button
-            onClick={() => switchDemoRole('admin')}
-            className={`px-2 py-0.5 rounded text-[11px] font-bold transition ${
-              user?.role === 'admin'
-                ? 'bg-[#C8F169] text-[#17231F] shadow-xs'
-                : 'bg-white/10 text-gray-200 hover:bg-white/20'
-            }`}
-          >
-            ⚡ Host (Kiran)
-          </button>
-          <button
-            onClick={() => switchDemoRole('superadmin')}
-            className={`px-2 py-0.5 rounded text-[11px] font-bold transition ${
-              user?.role === 'superadmin'
-                ? 'bg-[#C8F169] text-[#17231F] shadow-xs'
-                : 'bg-white/10 text-gray-200 hover:bg-white/20'
-            }`}
-          >
-            🛡️ Admin
-          </button>
-          <button
-            onClick={handleResetData}
-            disabled={resetting}
-            className="hidden md:inline-block ml-2 text-[10px] text-gray-300 hover:text-white underline"
-            title="Reset sample demo data"
-          >
-            {resetting ? 'Resetting...' : 'Reset Data'}
-          </button>
-        </div>
-      </div>
-
       {/* Top Navigation Bar - Glassmorphism Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-border shadow-xs transition-all">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-border shadow-xs transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand Wordmark */}
           <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
@@ -179,9 +111,12 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           {/* Right Actions / Auth Menu */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <div className="flex items-center gap-3 bg-[#F5F7F4] pl-3 pr-1.5 py-1.5 rounded-2xl border border-border">
-                <div className="text-right">
-                  <div className="text-xs font-extrabold text-[#17231F] leading-tight">
+              <div className="flex items-center gap-2.5 bg-[#F5F7F4] pl-2.5 pr-2 py-1.5 rounded-2xl border border-border">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#174D3A] to-[#1F6B50] text-[#C8F169] text-xs font-black flex items-center justify-center shadow-2xs">
+                  {user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div className="text-left pr-1">
+                  <div className="text-xs font-extrabold text-[#17231F] leading-tight max-w-[140px] truncate">
                     {user.display_name}
                   </div>
                   <div className="text-[10px] font-bold text-[#174D3A] uppercase tracking-wider">
@@ -189,12 +124,12 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       ? 'Charger Host'
                       : user.role === 'superadmin'
                       ? 'Superadmin'
-                      : 'Driver'}
+                      : 'EV Driver'}
                   </div>
                 </div>
                 <button
                   onClick={() => logout()}
-                  className="p-2 rounded-xl text-[#66736D] hover:text-rose-600 hover:bg-rose-50 transition min-h-[36px] min-w-[36px] flex items-center justify-center"
+                  className="p-1.5 rounded-xl text-[#66736D] hover:text-rose-600 hover:bg-rose-50 transition min-h-[34px] min-w-[34px] flex items-center justify-center border border-transparent hover:border-rose-200"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -405,7 +340,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               PostgreSQL Row-Level Security
             </span>
             <span className="font-medium">OpenStreetMap & Leaflet Geocoding</span>
-            <span className="text-gray-400">VoltSpot MVP v1.0</span>
+            <span className="text-gray-400">VoltSpot EV Network</span>
           </div>
         </div>
       </footer>

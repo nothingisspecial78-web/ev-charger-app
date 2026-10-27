@@ -22,10 +22,9 @@ export const LoginPage: React.FC = () => {
       if (!res.success) {
         setError(res.error || 'Invalid credentials');
       } else {
-        const cleanEmail = email.toLowerCase().trim();
-        if (cleanEmail === 'nothingisspecial78@gmail.com' || cleanEmail.includes('superadmin')) {
+        if (res.role === 'superadmin') {
           navigate('/superadmin');
-        } else if (cleanEmail.includes('owner') || cleanEmail.includes('admin')) {
+        } else if (res.role === 'admin') {
           navigate('/owner');
         } else {
           navigate('/chargers');
@@ -75,7 +74,7 @@ export const LoginPage: React.FC = () => {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="e.g. driver@voltspot.demo"
+              placeholder="name@example.com"
               required
               className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
             />
@@ -124,48 +123,53 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* 1-Click Seed Credentials for Reviewers / Evaluators */}
-        <div className="pt-4 border-t border-border space-y-3">
-          <div className="text-[11px] font-extrabold text-[#174D3A] uppercase tracking-wider text-center flex items-center justify-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Instant Demo Account Fill</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleFillCredentials('driver@voltspot.demo', 'Driver123!')}
-              className="py-2.5 px-2 rounded-xl text-center text-xs font-bold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[40px]"
-            >
-              🚗 Driver
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillCredentials('owner@voltspot.demo', 'Owner123!')}
-              className="py-2.5 px-2 rounded-xl text-center text-xs font-bold bg-[#F5F7F4] hover:bg-[#EAF3EF] hover:text-[#174D3A] border border-border transition min-h-[40px]"
-            >
-              ⚡ Host
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillCredentials('nothingisspecial78@gmail.com', 'abdu@1027')}
-              className="py-2.5 px-2 rounded-xl text-center text-xs font-bold bg-[#EAF3EF] text-[#174D3A] hover:bg-[#C8F169]/30 border border-[#C5DED3] transition min-h-[40px] flex items-center justify-center gap-1"
-            >
-              <Shield className="w-3.5 h-3.5 text-[#174D3A]" />
-              <span>Admin</span>
-            </button>
-          </div>
-
-          <p className="text-[11px] text-[#66736D] text-center">
-            Click any button above to auto-fill verified credentials.
-          </p>
-        </div>
-
         <div className="text-center text-xs text-[#66736D] pt-1">
           Don't have an account yet?{' '}
           <Link to="/signup" className="font-extrabold text-[#174D3A] hover:underline">
             Register here
           </Link>
+        </div>
+
+        {/* Quick Test Accounts Accordion (Collapsed) */}
+        <div className="pt-3 border-t border-border">
+          <details className="group text-center">
+            <summary className="text-[11px] font-semibold text-[#66736D] hover:text-[#174D3A] cursor-pointer transition select-none inline-flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-gray-50">
+              <Sparkles className="w-3 h-3 text-[#174D3A]" />
+              <span>Test Accounts & Quick Fill</span>
+            </summary>
+            <div className="mt-3 p-3 bg-[#F5F7F4] rounded-2xl border border-border text-left space-y-2 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-[#17231F]">🚗 EV Driver:</span>
+                <button
+                  type="button"
+                  onClick={() => handleFillCredentials('driver@voltspot.demo', 'Driver123!')}
+                  className="text-[11px] font-bold text-[#174D3A] hover:underline"
+                >
+                  Fill driver@voltspot.demo
+                </button>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-[#17231F]">⚡ Charger Host:</span>
+                <button
+                  type="button"
+                  onClick={() => handleFillCredentials('owner@voltspot.demo', 'Owner123!')}
+                  className="text-[11px] font-bold text-[#174D3A] hover:underline"
+                >
+                  Fill owner@voltspot.demo
+                </button>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-[#17231F]">🛡️ Platform Admin:</span>
+                <button
+                  type="button"
+                  onClick={() => handleFillCredentials('nothingisspecial78@gmail.com', 'abdu@1027')}
+                  className="text-[11px] font-bold text-[#174D3A] hover:underline"
+                >
+                  Fill nothingisspecial78@gmail.com
+                </button>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>

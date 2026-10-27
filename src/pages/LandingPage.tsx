@@ -35,7 +35,7 @@ export const LandingPage: React.FC = () => {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     owner: {
-      display_name: 'Kiran (Host & Owner)',
+      display_name: 'Kiran V. (Community Host)',
       phone: '+91 98450 12345',
     },
   };
@@ -109,7 +109,7 @@ export const LandingPage: React.FC = () => {
               <div className="bg-[#174D3A] text-white px-4 py-2.5 rounded-t-2xl text-xs font-bold flex items-center justify-between shadow-xs">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#C8F169] animate-pulse"></span>
-                  Verified Station Preview
+                  Featured Station Showcase
                 </span>
                 <span className="text-emerald-200 text-[11px] font-semibold">OpenStreetMap Live</span>
               </div>
