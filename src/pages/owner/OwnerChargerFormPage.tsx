@@ -11,6 +11,8 @@ import {
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
+  Crosshair,
+  Sparkles,
 } from 'lucide-react';
 
 export const OwnerChargerFormPage: React.FC = () => {
@@ -76,6 +78,15 @@ export const OwnerChargerFormPage: React.FC = () => {
     }
   };
 
+  const autofillCurrentCoords = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        setLatitude(pos.coords.latitude.toFixed(6));
+        setLongitude(pos.coords.longitude.toFixed(6));
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -92,7 +103,7 @@ export const OwnerChargerFormPage: React.FC = () => {
       return;
     }
     if (connectors.length === 0) {
-      setFormError('Select at least one supported connector type.');
+      setFormError('Select at least one supported connector standard.');
       return;
     }
     if (powerKw <= 0 || powerKw > 500) {
@@ -144,39 +155,45 @@ export const OwnerChargerFormPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="py-12 text-center text-[#66736D] animate-pulse">Loading form details...</div>;
+    return (
+      <div className="py-16 text-center text-[#66736D] animate-pulse">
+        <div className="w-10 h-10 border-3 border-[#174D3A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <span>Loading station specifications...</span>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 pb-24 px-2 sm:px-0">
       <div>
         <Link
           to="/owner/chargers"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#174D3A] hover:underline mb-2"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#174D3A] hover:underline mb-2 group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to My Chargers</span>
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight">
+        <h1 className="text-3xl font-extrabold text-[#17231F] tracking-tight">
           {isEditing ? 'Edit Charging Bay' : 'Register New Charger'}
         </h1>
-        <p className="text-sm text-[#66736D] mt-1">
-          Provide accurate specifications so EV drivers can discover and request your station.
+        <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
+          Configure technical specifications, tariffs, and parking access instructions for EV drivers.
         </p>
       </div>
 
       {formError && (
         <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-xs text-rose-700 flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <span>{formError}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section 1: Basics */}
-        <div className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2">
-            1. Basic Information
+        <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>1. Station Identity</span>
           </h2>
 
           <div>
@@ -189,30 +206,41 @@ export const OwnerChargerFormPage: React.FC = () => {
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Central Market Fast Charge"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] font-medium"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-[#17231F] mb-1.5">
-              Description (Optional)
+              Description & Surrounding Amenities (Optional)
             </label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="Describe amenities nearby, shade, lighting, café, or restrooms..."
+              placeholder="e.g. Dedicated parking bay with security guard, 24/7 lighting, café and restrooms 50 meters away..."
               rows={3}
               maxLength={800}
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A] resize-none"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] resize-none"
             />
           </div>
         </div>
 
         {/* Section 2: Location */}
-        <div className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2">
-            2. Location & Coordinates
-          </h2>
+        <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
+          <div className="flex items-center justify-between border-b border-border/80 pb-2">
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#174D3A] flex items-center gap-2">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>2. Location & Coordinates</span>
+            </h2>
+            <button
+              type="button"
+              onClick={autofillCurrentCoords}
+              className="text-xs font-bold text-[#174D3A] hover:underline flex items-center gap-1"
+            >
+              <Crosshair className="w-3.5 h-3.5" />
+              <span>Use Current GPS</span>
+            </button>
+          </div>
 
           <div>
             <label className="block text-xs font-bold text-[#17231F] mb-1.5">
@@ -222,9 +250,9 @@ export const OwnerChargerFormPage: React.FC = () => {
               type="text"
               value={address}
               onChange={e => setAddress(e.target.value)}
-              placeholder="e.g. Plot 14, Commercial Lane, Near Central Market, Kozhikode"
+              placeholder="e.g. Plot 14, Commercial Lane, Near Central Market, Kozhikode, Kerala"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] font-medium"
             />
           </div>
 
@@ -238,12 +266,12 @@ export const OwnerChargerFormPage: React.FC = () => {
                 value={area}
                 onChange={e => setArea(e.target.value)}
                 placeholder="e.g. Kozhikode Central"
-                className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[#17231F] mb-1.5">
-                Latitude (For Map)
+                Latitude (For Map Pin)
               </label>
               <input
                 type="number"
@@ -251,12 +279,12 @@ export const OwnerChargerFormPage: React.FC = () => {
                 value={latitude}
                 onChange={e => setLatitude(e.target.value)}
                 placeholder="e.g. 11.2588"
-                className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-[#17231F] mb-1.5">
-                Longitude (For Map)
+                Longitude (For Map Pin)
               </label>
               <input
                 type="number"
@@ -264,16 +292,17 @@ export const OwnerChargerFormPage: React.FC = () => {
                 value={longitude}
                 onChange={e => setLongitude(e.target.value)}
                 placeholder="e.g. 75.7804"
-                className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
               />
             </div>
           </div>
         </div>
 
         {/* Section 3: Charging Details */}
-        <div className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2">
-            3. Charging Technical Specifications
+        <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2 flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5 fill-current" />
+            <span>3. Technical Specifications</span>
           </h2>
 
           <div>
@@ -288,13 +317,13 @@ export const OwnerChargerFormPage: React.FC = () => {
                     key={connector}
                     type="button"
                     onClick={() => toggleConnector(connector)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border flex items-center gap-1.5 ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border flex items-center gap-2 ${
                       active
                         ? 'bg-[#174D3A] text-white border-[#174D3A] shadow-xs'
-                        : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F]'
+                        : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F] hover:bg-gray-100'
                     }`}
                   >
-                    <Zap className="w-3.5 h-3.5" />
+                    <Zap className="w-3.5 h-3.5 fill-current" />
                     <span>{connector}</span>
                   </button>
                 );
@@ -302,7 +331,7 @@ export const OwnerChargerFormPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
             <div>
               <label className="block text-xs font-bold text-[#17231F] mb-1.5">
                 Max Output Power (kW) *
@@ -311,12 +340,15 @@ export const OwnerChargerFormPage: React.FC = () => {
                 type="number"
                 min="1"
                 max="500"
-                step="0.1"
+                step="0.5"
                 value={powerKw}
                 onChange={e => setPowerKw(Number(e.target.value))}
                 required
-                className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] font-extrabold text-[#174D3A]"
               />
+              <span className="text-[11px] text-[#66736D] mt-1 block">
+                {powerKw >= 50 ? 'Classified as Rapid DC Fast Charging' : 'Classified as Level 2 AC Fast Charging'}
+              </span>
             </div>
 
             <div>
@@ -326,9 +358,9 @@ export const OwnerChargerFormPage: React.FC = () => {
               <select
                 value={availabilityStatus}
                 onChange={e => setAvailabilityStatus(e.target.value as any)}
-                className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] font-bold"
               >
-                <option value="available">Available</option>
+                <option value="available">Available Now</option>
                 <option value="busy">In Use (Busy)</option>
                 <option value="offline">Offline / Maintenance</option>
               </select>
@@ -337,14 +369,15 @@ export const OwnerChargerFormPage: React.FC = () => {
         </div>
 
         {/* Section 4: Access & Pricing */}
-        <div className="bg-white rounded-3xl border border-border p-6 shadow-subtle space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2">
-            4. Access & Tariff Rate
+        <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#174D3A] border-b border-border/80 pb-2 flex items-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>4. Access & Energy Tariff</span>
           </h2>
 
           <div>
             <label className="block text-xs font-bold text-[#17231F] mb-1.5">
-              Price Rate per kWh (₹ INR, leave blank if complimentary)
+              Tariff Rate per kWh (₹ INR, leave blank if free)
             </label>
             <input
               type="number"
@@ -353,7 +386,7 @@ export const OwnerChargerFormPage: React.FC = () => {
               value={pricePerKwh}
               onChange={e => setPricePerKwh(e.target.value)}
               placeholder="e.g. 18.5"
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] font-medium"
             />
           </div>
 
@@ -367,19 +400,19 @@ export const OwnerChargerFormPage: React.FC = () => {
               placeholder="e.g. Enter via Gate 2. Guard will unlock Bay #3. Safe turning radius for electric SUVs..."
               rows={3}
               maxLength={500}
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A] resize-none"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] resize-none"
             />
           </div>
 
           <div className="pt-2">
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={isPublished}
                 onChange={e => setIsPublished(e.target.checked)}
                 className="w-4 h-4 rounded text-[#174D3A] focus:ring-[#174D3A]"
               />
-              <span className="text-xs font-semibold text-[#17231F]">
+              <span className="text-xs font-bold text-[#17231F]">
                 Publish station immediately to driver discovery hub
               </span>
             </label>
@@ -390,17 +423,17 @@ export const OwnerChargerFormPage: React.FC = () => {
         <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
           <Link
             to="/owner/chargers"
-            className="w-full sm:w-auto text-center px-5 py-3 sm:py-2.5 rounded-xl border border-border text-sm font-semibold text-gray-700 hover:bg-gray-50 transition min-h-[44px] flex items-center justify-center"
+            className="w-full sm:w-auto text-center px-6 py-3 rounded-xl border border-border text-sm font-bold text-gray-700 hover:bg-gray-50 transition min-h-[44px] flex items-center justify-center"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-semibold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60 min-h-[44px]"
+            className="w-full sm:w-auto px-7 py-3 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-extrabold transition-all shadow-card hover:shadow-elevated flex items-center justify-center gap-2 disabled:opacity-60 min-h-[44px]"
           >
             <Save className="w-4 h-4 text-[#C8F169]" />
-            <span>{submitting ? 'Saving...' : isEditing ? 'Update Listing' : 'Save & Publish Charger'}</span>
+            <span>{submitting ? 'Saving Station...' : isEditing ? 'Update Listing' : 'Save & Publish Charger'}</span>
           </button>
         </div>
       </form>

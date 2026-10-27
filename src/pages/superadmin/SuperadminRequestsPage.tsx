@@ -46,13 +46,17 @@ export const SuperadminRequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight">
+          <div className="flex items-center gap-2 text-xs font-extrabold text-[#174D3A] uppercase tracking-wider mb-1">
+            <ListOrdered className="w-4 h-4 text-[#174D3A]" />
+            <span>Audit Trail & Oversight</span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-[#17231F] tracking-tight">
             Platform Booking Requests Oversight
           </h1>
-          <p className="text-sm text-[#66736D] mt-1">
+          <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
             Superadmin visibility across all driver queries and host decisions with audit trail logging.
           </p>
         </div>
@@ -60,7 +64,7 @@ export const SuperadminRequestsPage: React.FC = () => {
         <button
           onClick={fetchRequests}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-border text-xs font-semibold text-[#17231F] hover:bg-gray-50 self-start sm:self-auto shadow-xs"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-border text-xs font-bold text-[#17231F] hover:bg-gray-50 self-start sm:self-auto shadow-2xs hover:shadow-xs min-h-[40px] transition-all"
         >
           <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
@@ -68,66 +72,52 @@ export const SuperadminRequestsPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center text-[#66736D] animate-pulse">Loading all platform requests...</div>
+        <div className="py-16 text-center text-xs sm:text-sm text-[#66736D] animate-pulse">
+          <div className="w-10 h-10 border-3 border-[#174D3A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <span>Loading all platform requests...</span>
+        </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-subtle">
+        <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-card">
           {/* Mobile Card View (< 768px) */}
           <div className="block md:hidden divide-y divide-border/80">
             {requests.map(req => (
-              <div key={req.id} className="p-4 space-y-3">
+              <div key={req.id} className="p-5 space-y-3.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="font-bold text-[#17231F] text-sm leading-snug">{req.charger?.name || 'Charging Bay'}</h3>
-                    <div className="text-[11px] font-mono text-[#66736D] truncate">{req.id}</div>
+                    <h3 className="font-extrabold text-[#17231F] text-base leading-snug">{req.charger?.name || 'Charging Bay'}</h3>
+                    <div className="text-xs text-[#66736D] mt-0.5 truncate">
+                      Driver: {req.driver?.display_name || 'Anonymous'}
+                    </div>
                   </div>
                   <RequestStatusBadge status={req.status} />
                 </div>
 
-                {req.driver_note && (
-                  <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded-xl italic">
-                    "{req.driver_note}"
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-2 text-xs bg-[#F5F7F4] p-2.5 rounded-xl">
+                <div className="grid grid-cols-2 gap-2 bg-[#F5F7F4] rounded-2xl p-3 text-xs border border-[#E8EDE9]">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#8C9B94] block">Driver</span>
-                    <span className="font-semibold text-[#17231F] block truncate mt-0.5">
-                      {req.driver?.display_name || 'Driver'}
+                    <span className="text-[#66736D] block font-semibold">Scheduled Start</span>
+                    <span className="font-bold text-[#17231F]">
+                      {new Date(req.requested_start).toLocaleString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </span>
-                    {req.driver?.phone && (
-                      <a href={`tel:${req.driver.phone}`} className="text-[11px] text-[#174D3A] hover:underline block truncate">
-                        {req.driver.phone}
-                      </a>
-                    )}
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#8C9B94] block">Schedule</span>
-                    <div className="flex items-center gap-1 text-[#17231F] font-medium mt-0.5">
-                      <Calendar className="w-3 h-3 text-[#174D3A] shrink-0" />
-                      <span className="truncate">
-                        {new Date(req.requested_start).toLocaleString([], {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-[#66736D] block font-semibold">
-                      {req.duration_minutes} mins duration
-                    </span>
+                    <span className="text-[#66736D] block font-semibold">Duration</span>
+                    <span className="font-bold text-[#17231F]">{req.duration_minutes} mins</span>
                   </div>
                 </div>
 
-                {req.status !== 'cancelled' && (
-                  <div className="pt-1 flex justify-end">
+                {req.status === 'pending' && (
+                  <div className="pt-2 flex justify-end">
                     <button
                       onClick={() => setOverrideTarget(req)}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-2 rounded-xl transition"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition min-h-[38px]"
                     >
                       <XOctagon className="w-3.5 h-3.5" />
-                      <span>Administrative Override Cancel</span>
+                      <span>Admin Cancel Override</span>
                     </button>
                   </div>
                 )}
@@ -138,69 +128,57 @@ export const SuperadminRequestsPage: React.FC = () => {
           {/* Desktop Table View (>= 768px) */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F5F7F4] text-[#66736D] text-xs font-bold uppercase tracking-wider border-b border-border">
+              <thead className="bg-[#F5F7F4] text-[#66736D] text-xs font-extrabold uppercase tracking-wider border-b border-border">
                 <tr>
-                  <th className="py-4 px-6">Request ID / Station</th>
-                  <th className="py-4 px-4">Driver</th>
-                  <th className="py-4 px-4">Requested Time</th>
+                  <th className="py-4 px-6">Charging Bay</th>
+                  <th className="py-4 px-4">Driver / Requester</th>
+                  <th className="py-4 px-4">Requested Schedule</th>
                   <th className="py-4 px-4">Duration</th>
-                  <th className="py-4 px-4">Status</th>
-                  <th className="py-4 px-6 text-right">Administrative Action</th>
+                  <th className="py-4 px-4">State</th>
+                  <th className="py-4 px-6 text-right">Superadmin Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
                 {requests.map(req => (
-                  <tr key={req.id} className="hover:bg-gray-50/80 transition">
-                    <td className="py-4 px-6">
-                      <div className="font-bold text-[#17231F]">
-                        {req.charger?.name || 'Charging Bay'}
-                      </div>
-                      <div className="text-[11px] font-mono text-[#66736D]">{req.id}</div>
-                      {req.driver_note && (
-                        <div className="text-xs text-gray-500 italic mt-0.5 line-clamp-1">
-                          "{req.driver_note}"
-                        </div>
-                      )}
+                  <tr key={req.id} className="hover:bg-gray-50/70 transition">
+                    <td className="py-5 px-6">
+                      <div className="font-extrabold text-[#17231F] text-base">{req.charger?.name || 'Charging Bay'}</div>
+                      <div className="text-[11px] font-mono text-[#66736D]">ID: {req.id.slice(0, 8)}</div>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <div className="font-semibold text-xs text-[#17231F]">
-                        {req.driver?.display_name || 'Driver'}
-                      </div>
+                    <td className="py-5 px-4">
+                      <div className="font-bold text-[#17231F]">{req.driver?.display_name || 'Driver'}</div>
+                      <div className="text-xs text-[#66736D]">{req.driver?.phone || 'No phone'}</div>
                     </td>
 
-                    <td className="py-4 px-4 text-xs">
-                      <div className="flex items-center gap-1 text-[#17231F] font-medium">
-                        <Calendar className="w-3.5 h-3.5 text-[#174D3A]" />
-                        <span>
-                          {new Date(req.requested_start).toLocaleString([], {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
+                    <td className="py-5 px-4 font-semibold text-[#17231F] text-xs">
+                      {new Date(req.requested_start).toLocaleString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </td>
 
-                    <td className="py-4 px-4 text-xs font-semibold text-[#17231F]">
+                    <td className="py-5 px-4 font-extrabold text-[#174D3A] text-xs">
                       {req.duration_minutes} mins
                     </td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-5 px-4">
                       <RequestStatusBadge status={req.status} />
                     </td>
 
-                    <td className="py-4 px-6 text-right">
-                      {req.status !== 'cancelled' && (
+                    <td className="py-5 px-6 text-right">
+                      {req.status === 'pending' ? (
                         <button
                           onClick={() => setOverrideTarget(req)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg transition"
-                          title="Platform override cancel"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition shadow-2xs"
                         >
                           <XOctagon className="w-3.5 h-3.5" />
-                          <span>Cancel Override</span>
+                          <span>Override Cancel</span>
                         </button>
+                      ) : (
+                        <span className="text-xs text-[#66736D] font-medium">—</span>
                       )}
                     </td>
                   </tr>
@@ -211,15 +189,15 @@ export const SuperadminRequestsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Override Confirmation Modal */}
+      {/* Cancellation Override Modal */}
       <ConfirmModal
         isOpen={Boolean(overrideTarget)}
-        title="Administrative Request Cancellation"
-        message={`Are you sure you want to administratively override and cancel request ${overrideTarget?.id}? This action will be recorded in the platform audit log.`}
-        confirmLabel={processing ? 'Processing...' : 'Confirm Administrative Cancellation'}
+        title="Override & Cancel Booking Request?"
+        message={`As Superadmin, you are cancelling request ${overrideTarget?.id.slice(0, 8)} on behalf of the platform. This action is recorded in audit logs.`}
+        confirmLabel={processing ? 'Cancelling...' : 'Confirm Admin Override'}
         isDestructive={true}
         noteInput={true}
-        notePlaceholder="Reason for override (e.g. Disputed session, safety conflict, host request)..."
+        notePlaceholder="Audit reason for cancellation override..."
         onConfirm={handleConfirmOverride}
         onCancel={() => setOverrideTarget(null)}
       />

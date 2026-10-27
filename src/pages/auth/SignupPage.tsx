@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, UserPlus, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Zap, UserPlus, AlertCircle, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<'driver' | 'admin'>('driver');
   const [error, setError] = useState<string | null>(null);
@@ -44,23 +45,23 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-6 sm:py-12 px-3 sm:px-0 space-y-6">
-      <div className="bg-white rounded-3xl border border-border p-5 sm:p-8 shadow-card space-y-6">
+    <div className="max-w-md mx-auto py-8 sm:py-16 px-3 sm:px-0 space-y-6">
+      <div className="bg-white rounded-3xl border border-border p-6 sm:p-9 shadow-card space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#174D3A] text-[#C8F169] flex items-center justify-center mx-auto shadow-sm">
-            <Zap className="w-6 h-6 fill-current" />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#174D3A] to-[#1F6B50] text-[#C8F169] flex items-center justify-center mx-auto shadow-sm">
+            <Zap className="w-7 h-7 fill-current" />
           </div>
-          <h1 className="text-2xl font-extrabold text-[#17231F] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight">
             Create your VoltSpot Account
           </h1>
-          <p className="text-xs text-[#66736D]">
-            Join as an EV driver or list your charging bay as a host.
+          <p className="text-xs sm:text-sm text-[#66736D]">
+            Join as an EV driver or register as a private/commercial charger host.
           </p>
         </div>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-700 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-xs text-rose-700 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
@@ -75,27 +76,27 @@ export const SignupPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setRole('driver')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition border ${
+                className={`py-3 px-3 rounded-xl text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 min-h-[44px] ${
                   role === 'driver'
                     ? 'bg-[#174D3A] text-white border-[#174D3A] shadow-xs'
                     : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F]'
                 }`}
               >
-                EV Driver
+                <span>🚗 EV Driver</span>
               </button>
               <button
                 type="button"
                 onClick={() => setRole('admin')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition border ${
+                className={`py-3 px-3 rounded-xl text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 min-h-[44px] ${
                   role === 'admin'
                     ? 'bg-[#174D3A] text-white border-[#174D3A] shadow-xs'
                     : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F]'
                 }`}
               >
-                Charger Host
+                <span>⚡ Charger Host</span>
               </button>
             </div>
-            <span className="text-[10px] text-[#66736D] mt-1 block">
+            <span className="text-[10px] text-[#66736D] mt-1.5 block">
               Superadmin privileges are securely provisioned and cannot be self-selected.
             </span>
           </div>
@@ -110,7 +111,7 @@ export const SignupPage: React.FC = () => {
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Rahul Sharma"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
             />
           </div>
 
@@ -124,7 +125,7 @@ export const SignupPage: React.FC = () => {
               onChange={e => setEmail(e.target.value)}
               placeholder="name@example.com"
               required
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
             />
           </div>
 
@@ -132,43 +133,62 @@ export const SignupPage: React.FC = () => {
             <label className="block text-xs font-bold text-[#17231F] mb-1.5">
               Password * (Min 6 characters)
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 pr-10 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-[#17231F] mb-1.5">
-              Phone Number (Optional)
+              Phone Number (For Host Coordination)
             </label>
             <input
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="+91 98765 43210"
-              className="w-full text-sm rounded-xl border border-border p-2.5 focus:outline-none focus:ring-2 focus:ring-[#174D3A]"
+              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-sm font-bold transition shadow-card flex items-center justify-center gap-2 disabled:opacity-60"
+            className="w-full py-4 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-xs sm:text-sm font-extrabold transition-all shadow-card hover:shadow-elevated flex items-center justify-center gap-2 disabled:opacity-60 min-h-[46px] group"
           >
-            <UserPlus className="w-4 h-4 text-[#C8F169]" />
-            <span>{submitting ? 'Creating Profile...' : 'Complete Registration'}</span>
+            {submitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="w-4 h-4 text-[#C8F169] group-hover:translate-x-0.5 transition-transform" />
+                <span>Complete Registration</span>
+              </>
+            )}
           </button>
         </form>
 
-        <div className="text-center text-xs text-[#66736D]">
-          Already registered?{' '}
-          <Link to="/login" className="font-bold text-[#174D3A] hover:underline">
+        <div className="text-center text-xs text-[#66736D] pt-1">
+          Already have an account?{' '}
+          <Link to="/login" className="font-extrabold text-[#174D3A] hover:underline">
             Sign In here
           </Link>
         </div>
