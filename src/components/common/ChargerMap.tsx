@@ -63,7 +63,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
     Object.values(markersRef.current).forEach(marker => marker.remove());
     markersRef.current = {};
 
-    // 1. Add User Location Marker with radar ping
+    // 1. Add user location marker
     if (userMarkerRef.current) {
       userMarkerRef.current.remove();
       userMarkerRef.current = null;
@@ -72,12 +72,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
     if (userCoords) {
       const userIcon = L.divIcon({
         className: 'user-location-marker',
-        html: `
-          <div class="relative flex items-center justify-center w-8 h-8">
-            <span class="absolute w-8 h-8 rounded-full bg-emerald-500 opacity-30 animate-ping"></span>
-            <span class="relative w-4 h-4 rounded-full bg-[#174D3A] border-2 border-[#C8F169] shadow-lg"></span>
-          </div>
-        `,
+        html: '<div class="relative flex h-8 w-8 items-center justify-center"><span class="relative h-4 w-4 rounded-full border-2 border-accent bg-primary"></span></div>',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
       });
@@ -86,7 +81,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
         icon: userIcon,
       })
         .addTo(map)
-        .bindPopup('<div class="font-bold text-xs p-1">📍 You Are Here (Kozhikode GPS)</div>');
+        .bindPopup('<div class="p-1 text-xs font-semibold">Your location</div>');
     }
 
     // 2. Add Charger Markers
@@ -110,7 +105,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
           ? 'bg-amber-600'
           : charger.availability_status === 'offline'
           ? 'bg-gray-600'
-          : 'bg-[#174D3A]';
+          : 'bg-primary';
 
       const customIcon = L.divIcon({
         className: 'volt-custom-marker',
@@ -131,52 +126,41 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
 
       const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
 
-      // Popup Content with modern luxury styling
+      // Build popup nodes with textContent so listing data can never become HTML.
       const popupContent = document.createElement('div');
-      popupContent.className = 'p-1 font-sans text-xs min-w-[210px] space-y-1.5';
-      popupContent.innerHTML = `
-        <div class="flex items-center justify-between gap-2">
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
-            charger.power_kw >= 50 ? 'bg-[#174D3A] text-[#C8F169]' : 'bg-gray-100 text-gray-800'
-          }">
-            ⚡ ${charger.power_kw} kW
-          </span>
-          <span class="text-[10px] font-bold text-gray-700">
-            ${charger.price_per_kwh ? `₹${charger.price_per_kwh}/kWh` : 'Free'}
-          </span>
-        </div>
-
-        <div class="font-extrabold text-sm text-[#17231F] leading-tight pt-1">${charger.name}</div>
-        <div class="text-[#66736D] text-[11px] leading-tight">${charger.area || charger.address}</div>
-        
-        <div class="flex items-center gap-1.5 text-[11px] text-[#174D3A] font-semibold">
-          <span>Plugs: ${charger.connector_types.join(', ')}</span>
-        </div>
-
-        ${
-          dist !== null
-            ? `
-          <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg p-1.5 text-[11px] font-bold flex items-center justify-between">
-            <span>🚗 ~${dist.toFixed(1)} km away</span>
-            <span>~${drivingMins} mins</span>
-          </div>
-        `
-            : ''
-        }
-
-        <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-gray-100">
-          <button id="view-charger-${charger.id}" class="py-2 px-2.5 bg-[#174D3A] text-white rounded-lg font-bold text-center hover:bg-[#123D2E] transition text-[11px] shadow-sm">
-            Request Slot
-          </button>
-          <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2 bg-white border border-gray-300 text-gray-800 rounded-lg font-bold text-center hover:bg-gray-50 transition text-[11px] flex items-center justify-center gap-1">
-            Google Maps ↗
-          </a>
-        </div>
-      `;
-
-      popupContent.querySelector(`#view-charger-${charger.id}`)?.addEventListener('click', () => {
+      popupContent.className = 'min-w-[210px] space-y-2 p-1 font-sans text-xs';
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-sm leading-tight';
+      title.textContent = charger.name;
+      const location = document.createElement('div');
+      location.className = 'text-[11px] text-muted';
+      location.textContent = charger.area || charger.address;
+      const specs = document.createElement('div');
+      specs.className = 'text-[11px] font-semibold text-primary';
+      specs.textContent = `${charger.power_kw} kW · ${charger.price_per_kwh ? `₹${charger.price_per_kwh}/kWh` : 'Free'} · ${charger.connector_types.join(', ')}`;
+      popupContent.append(title, location, specs);
+      if (dist !== null) {
+        const distance = document.createElement('div');
+        distance.className = 'rounded-lg bg-primary-50 p-1.5 text-[11px] font-semibold text-primary';
+        distance.textContent = `About ${dist.toFixed(1)} km away · ${drivingMins} min drive`;
+        popupContent.append(distance);
+      }
+      const actions = document.createElement('div');
+      actions.className = 'flex gap-1.5 border-t border-border pt-2';
+      const viewButton = document.createElement('button');
+      viewButton.className = 'flex-1 rounded-lg bg-primary px-2.5 py-2 text-[11px] font-semibold text-white';
+      viewButton.textContent = 'View details';
+      viewButton.addEventListener('click', () => {
         navigate(`/chargers/${charger.id}`);
       });
+      const directions = document.createElement('a');
+      directions.href = navUrl;
+      directions.target = '_blank';
+      directions.rel = 'noopener noreferrer';
+      directions.className = 'rounded-lg border border-border px-2 py-2 text-[11px] font-semibold text-foreground';
+      directions.textContent = 'Directions';
+      actions.append(viewButton, directions);
+      popupContent.append(actions);
 
       marker.bindPopup(popupContent);
       marker.on('click', () => {
@@ -213,7 +197,7 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
         ];
 
         routeLineRef.current = L.polyline(latlngs, {
-          color: '#174D3A',
+          color: 'var(--primary)',
           weight: 4,
           dashArray: '8, 8',
           opacity: 0.85,
@@ -235,10 +219,6 @@ export const ChargerMap: React.FC<ChargerMapProps> = ({
   return (
     <div className={`relative overflow-hidden border border-border shadow-card ${className}`}>
       <div ref={mapContainerRef} className="h-full w-full z-0" />
-      <div className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-border shadow-sm text-xs font-bold text-[#17231F] flex items-center gap-2">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-        <span>OpenStreetMap Live Network</span>
-      </div>
     </div>
   );
 };

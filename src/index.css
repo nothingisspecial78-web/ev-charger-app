@@ -6,7 +6,7 @@
   --background: #F5F7F4;
   --surface: #FFFFFF;
   --foreground: #17231F;
-  --muted: #66736D;
+  --muted: #5B6862;
   --border: #E1E7E2;
   --primary: #174D3A;
   --primary-hover: #123D2E;
@@ -23,15 +23,10 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(200, 241, 105, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(23, 77, 58, 0.07) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(200, 241, 105, 0.05) 0px, transparent 50%);
-  background-attachment: fixed;
 }
 
 /* Custom sleek scrollbars */
@@ -40,7 +35,7 @@ body {
   height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #F0F4F1;
+  background: var(--surface-muted);
 }
 ::-webkit-scrollbar-thumb {
   background: #C3CCC6;
@@ -50,24 +45,24 @@ body {
   background: #9AA8A0;
 }
 
-/* Leaflet map custom marker & radar pulse */
+/* Leaflet map custom marker */
 .volt-map-pin {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background: #174D3A;
   color: #C8F169;
-  border: 3px solid #FFFFFF;
+  border: 2px solid #FFFFFF;
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(23, 77, 58, 0.45);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(23, 77, 58, 0.2);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
   cursor: pointer;
 }
 .volt-map-pin:hover {
-  transform: scale(1.18);
-  box-shadow: 0 6px 20px rgba(23, 77, 58, 0.6);
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(23, 77, 58, 0.28);
 }
 
 /* Beacon pulse ring for map pin */
@@ -91,34 +86,31 @@ body {
   height: 100%;
   border-radius: 50%;
   background: rgba(200, 241, 105, 0.6);
-  animation: volt-radar 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  animation: volt-radar 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1;
   pointer-events: none;
 }
 
-/* Glass effect utilities */
+/* Kept as compatibility utilities; surfaces remain opaque and calm. */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(225, 231, 226, 0.85);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(225, 231, 226, 0.9);
-  box-shadow: 0 4px 20px -2px rgba(23, 35, 31, 0.05), 0 2px 6px -1px rgba(23, 35, 31, 0.03);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 /* Tactile button clicks */
-button:active:not(:disabled), a:active:not(:disabled) {
-  transform: scale(0.985);
-}
-
 /* Accessible focus ring */
 :focus-visible {
-  outline: none;
-  ring: 2px solid #174D3A;
-  ring-offset: 2px;
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

@@ -47,14 +47,14 @@ export const SuperadminOverviewPage: React.FC = () => {
     <div className="space-y-8 pb-20">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 text-xs font-extrabold text-[#174D3A] uppercase tracking-wider mb-1">
-          <Shield className="w-4 h-4 text-[#174D3A]" />
+        <div className="flex items-center gap-2 text-xs font-extrabold text-primary uppercase tracking-wider mb-1">
+          <Shield className="w-4 h-4 text-primary" />
           <span>Platform Administration & Governance</span>
         </div>
-        <h1 className="text-3xl font-extrabold text-[#17231F] tracking-tight">
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           System Overview & Metrics
         </h1>
-        <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
+        <p className="text-xs sm:text-sm text-muted mt-1 font-medium">
           Verified database aggregates, active station counts, and ecosystem oversight.
         </p>
       </div>
@@ -96,13 +96,13 @@ export const SuperadminOverviewPage: React.FC = () => {
         {/* Recent Platform Requests */}
         <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-border/80 pb-3.5">
-            <h2 className="text-base font-extrabold text-[#17231F] flex items-center gap-2">
-              <ListOrdered className="w-4 h-4 text-[#174D3A]" />
+            <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
+              <ListOrdered className="w-4 h-4 text-primary" />
               <span>Recent Reservation Queries</span>
             </h2>
             <Link
               to="/superadmin/requests"
-              className="text-xs font-bold text-[#174D3A] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
             >
               <span>View All</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -110,19 +110,19 @@ export const SuperadminOverviewPage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="py-8 text-center text-xs text-[#66736D] animate-pulse">Loading platform queries...</div>
+            <div className="py-8 text-center text-xs text-muted animate-pulse">Loading platform queries...</div>
           ) : recentRequests.length === 0 ? (
-            <div className="py-8 text-center text-xs text-[#66736D]">No reservation requests recorded.</div>
+            <div className="py-8 text-center text-xs text-muted">No reservation requests recorded.</div>
           ) : (
             <div className="space-y-3">
               {recentRequests.map(r => (
                 <div
                   key={r.id}
-                  className="bg-[#F5F7F4] rounded-2xl p-3.5 text-xs flex items-center justify-between gap-3 border border-border/70 hover:border-[#174D3A]/30 transition"
+                  className="bg-background rounded-2xl p-3.5 text-xs flex items-center justify-between gap-3 border border-border/70 hover:border-primary/30 transition"
                 >
                   <div className="min-w-0">
-                    <div className="font-extrabold text-[#17231F] truncate">{r.charger?.name || 'Charging Bay'}</div>
-                    <div className="text-[11px] text-[#66736D] mt-0.5 truncate">
+                    <div className="font-extrabold text-foreground truncate">{r.charger?.name || 'Charging Bay'}</div>
+                    <div className="text-[11px] text-muted mt-0.5 truncate">
                       Driver: {r.driver?.display_name || 'Anonymous'} • {r.duration_minutes}m slot
                     </div>
                   </div>
@@ -136,13 +136,13 @@ export const SuperadminOverviewPage: React.FC = () => {
         {/* Station Moderation Quick Look */}
         <div className="bg-white rounded-3xl border border-border p-6 sm:p-7 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-border/80 pb-3.5">
-            <h2 className="text-base font-extrabold text-[#17231F] flex items-center gap-2">
-              <Zap className="w-4 h-4 text-[#174D3A]" />
+            <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
               <span>Charging Stations</span>
             </h2>
             <Link
               to="/superadmin/chargers"
-              className="text-xs font-bold text-[#174D3A] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
             >
               <span>Moderate All</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -150,20 +150,20 @@ export const SuperadminOverviewPage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="py-8 text-center text-xs text-[#66736D] animate-pulse">Loading stations...</div>
+            <div className="py-8 text-center text-xs text-muted animate-pulse">Loading stations...</div>
           ) : chargers.length === 0 ? (
-            <div className="py-8 text-center text-xs text-[#66736D]">No charging stations recorded.</div>
+            <div className="py-8 text-center text-xs text-muted">No charging stations recorded.</div>
           ) : (
             <div className="space-y-3">
               {chargers.map(c => (
                 <div
                   key={c.id}
-                  className="bg-[#F5F7F4] rounded-2xl p-3.5 text-xs flex items-center justify-between gap-3 border border-border/70 hover:border-[#174D3A]/30 transition"
+                  className="bg-background rounded-2xl p-3.5 text-xs flex items-center justify-between gap-3 border border-border/70 hover:border-primary/30 transition"
                 >
                   <div className="min-w-0">
-                    <div className="font-extrabold text-[#17231F] truncate">{c.name}</div>
-                    <div className="text-[11px] text-[#66736D] flex items-center gap-1 mt-0.5 truncate">
-                      <MapPin className="w-3 h-3 text-[#174D3A] shrink-0" />
+                    <div className="font-extrabold text-foreground truncate">{c.name}</div>
+                    <div className="text-[11px] text-muted flex items-center gap-1 mt-0.5 truncate">
+                      <MapPin className="w-3 h-3 text-primary shrink-0" />
                       <span className="truncate">{c.area || c.address}</span>
                     </div>
                   </div>

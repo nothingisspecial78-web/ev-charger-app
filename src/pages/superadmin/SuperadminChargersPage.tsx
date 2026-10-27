@@ -5,9 +5,11 @@ import { Charger } from '@/types';
 import { ChargerStatusBadge } from '@/components/common/Badges';
 import { ConfirmModal } from '@/components/common/Feedback';
 import { Zap, ShieldAlert, CheckCircle2, RotateCcw, MapPin, Power } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 export const SuperadminChargersPage: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [chargers, setChargers] = useState<Charger[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +42,7 @@ export const SuperadminChargersPage: React.FC = () => {
       setModTarget(null);
       await fetchChargers();
     } catch (err: any) {
-      alert(err?.message || 'Moderation action failed');
+      toast(err?.message || 'Moderation action failed', 'error');
     } finally {
       setProcessing(false);
     }
@@ -50,14 +52,14 @@ export const SuperadminChargersPage: React.FC = () => {
     <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-extrabold text-[#174D3A] uppercase tracking-wider mb-1">
-            <Zap className="w-4 h-4 fill-current text-[#174D3A]" />
+          <div className="flex items-center gap-2 text-xs font-extrabold text-primary uppercase tracking-wider mb-1">
+            <Zap className="w-4 h-4 fill-current text-primary" />
             <span>Station Governance</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-[#17231F] tracking-tight">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Charger Station Moderation
           </h1>
-          <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
+          <p className="text-xs sm:text-sm text-muted mt-1 font-medium">
             Superadmin override controls to deactivate problematic listings or reactivate approved bays.
           </p>
         </div>
@@ -65,7 +67,7 @@ export const SuperadminChargersPage: React.FC = () => {
         <button
           onClick={fetchChargers}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-border text-xs font-bold text-[#17231F] hover:bg-gray-50 self-start sm:self-auto shadow-2xs hover:shadow-xs min-h-[40px] transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-border text-xs font-bold text-foreground hover:bg-gray-50 self-start sm:self-auto shadow-2xs hover:shadow-xs min-h-[40px] transition-all"
         >
           <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
@@ -73,8 +75,8 @@ export const SuperadminChargersPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-xs sm:text-sm text-[#66736D] animate-pulse">
-          <div className="w-10 h-10 border-3 border-[#174D3A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <div className="py-16 text-center text-xs sm:text-sm text-muted animate-pulse">
+          <div className="w-10 h-10 border-[3px] border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <span>Loading charging stations...</span>
         </div>
       ) : (
@@ -85,9 +87,9 @@ export const SuperadminChargersPage: React.FC = () => {
               <div key={charger.id} className="p-5 space-y-3.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="font-extrabold text-[#17231F] text-base leading-snug">{charger.name}</h3>
-                    <div className="text-xs text-[#66736D] flex items-center gap-1.5 mt-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#174D3A] shrink-0" />
+                    <h3 className="font-extrabold text-foreground text-base leading-snug">{charger.name}</h3>
+                    <div className="text-xs text-muted flex items-center gap-1.5 mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span className="truncate">{charger.address}</span>
                     </div>
                   </div>
@@ -105,20 +107,20 @@ export const SuperadminChargersPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between bg-[#F5F7F4] rounded-2xl p-3 text-xs border border-[#E8EDE9]">
+                <div className="flex items-center justify-between bg-background rounded-2xl p-3 text-xs border border-border">
                   <div>
-                    <span className="text-[#66736D] block font-semibold">Peak Power</span>
-                    <span className="font-extrabold text-[#174D3A] text-sm">{charger.power_kw} kW</span>
+                    <span className="text-muted block font-semibold">Peak Power</span>
+                    <span className="font-extrabold text-primary text-sm">{charger.power_kw} kW</span>
                   </div>
                   <div>
-                    <span className="text-[#66736D] block font-semibold">Tariff</span>
-                    <span className="font-extrabold text-[#17231F] text-sm">
+                    <span className="text-muted block font-semibold">Tariff</span>
+                    <span className="font-extrabold text-foreground text-sm">
                       {charger.price_per_kwh ? `₹${charger.price_per_kwh}/kWh` : 'Free'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#66736D] block font-semibold">Plugs</span>
-                    <span className="font-bold text-[#17231F]">{charger.connector_types.join(', ')}</span>
+                    <span className="text-muted block font-semibold">Plugs</span>
+                    <span className="font-bold text-foreground">{charger.connector_types.join(', ')}</span>
                   </div>
                 </div>
 
@@ -142,7 +144,7 @@ export const SuperadminChargersPage: React.FC = () => {
           {/* Desktop Table View (>= 768px) */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F5F7F4] text-[#66736D] text-xs font-extrabold uppercase tracking-wider border-b border-border">
+              <thead className="bg-background text-muted text-xs font-extrabold uppercase tracking-wider border-b border-border">
                 <tr>
                   <th className="py-4 px-6">Station / Location</th>
                   <th className="py-4 px-4">Power / Connectors</th>
@@ -155,24 +157,24 @@ export const SuperadminChargersPage: React.FC = () => {
                 {chargers.map(charger => (
                   <tr key={charger.id} className="hover:bg-gray-50/70 transition">
                     <td className="py-5 px-6">
-                      <div className="font-extrabold text-[#17231F] text-base">{charger.name}</div>
-                      <div className="text-xs text-[#66736D] flex items-center gap-1.5 mt-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#174D3A] shrink-0" />
+                      <div className="font-extrabold text-foreground text-base">{charger.name}</div>
+                      <div className="text-xs text-muted flex items-center gap-1.5 mt-1">
+                        <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
                         <span>{charger.area || charger.address}</span>
                       </div>
                     </td>
 
                     <td className="py-5 px-4">
-                      <div className="font-extrabold text-[#174D3A] flex items-center gap-1">
+                      <div className="font-extrabold text-primary flex items-center gap-1">
                         <Zap className="w-4 h-4 fill-current" />
                         <span>{charger.power_kw} kW</span>
                       </div>
-                      <div className="text-xs text-[#66736D] mt-0.5 font-medium">
+                      <div className="text-xs text-muted mt-0.5 font-medium">
                         {charger.connector_types.join(', ')}
                       </div>
                     </td>
 
-                    <td className="py-5 px-4 font-bold text-[#17231F]">
+                    <td className="py-5 px-4 font-bold text-foreground">
                       {charger.price_per_kwh ? `₹${charger.price_per_kwh}/kWh` : 'Free'}
                     </td>
 
@@ -224,6 +226,8 @@ export const SuperadminChargersPage: React.FC = () => {
         confirmLabel={processing ? 'Updating...' : modTarget?.is_active ? 'Deactivate Station' : 'Reactivate Station'}
         isDestructive={Boolean(modTarget?.is_active)}
         noteInput={true}
+        noteLabel="Reason (required)"
+        noteRequired={true}
         notePlaceholder="Provide moderation audit reason..."
         onConfirm={handleConfirmModeration}
         onCancel={() => setModTarget(null)}

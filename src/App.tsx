@@ -27,7 +27,7 @@ const ProtectedRoute: React.FC<{
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="py-20 text-center text-sm font-semibold text-[#66736D]">Verifying session...</div>;
+    return <div className="py-20 text-center text-sm font-semibold text-muted">Verifying session...</div>;
   }
 
   if (!user) {

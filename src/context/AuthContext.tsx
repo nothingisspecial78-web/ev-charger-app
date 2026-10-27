@@ -14,32 +14,9 @@ export interface AuthContextType {
     phone?: string
   ) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
   logout: () => Promise<void>;
-  switchDemoRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Fictional realistic demo profile references with valid hexadecimal UUIDs
-export const DEMO_USERS: Record<UserRole, Profile> = {
-  driver: {
-    id: 'd1111111-1111-4111-8111-111111111111',
-    display_name: 'Rahul Driver',
-    role: 'driver',
-    phone: '+91 98765 43210',
-  },
-  admin: {
-    id: 'a2222222-2222-4222-8222-222222222222',
-    display_name: 'Kiran (Host & Charger Owner)',
-    role: 'admin',
-    phone: '+91 98450 12345',
-  },
-  superadmin: {
-    id: 'e3333333-3333-4333-8333-333333333333',
-    display_name: 'Abdulla (Platform Superadmin)',
-    role: 'superadmin',
-    phone: '+91 94470 99999',
-  },
-};
 
 const AUTH_STORAGE_KEY = 'voltspot_active_user';
 
@@ -149,28 +126,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // 2. High-reliability fallback for pre-seeded verified accounts
-      if (cleanEmail === 'nothingisspecial78@gmail.com') {
-        if (pass !== 'abdu@1027') return { success: false, error: 'Incorrect password' };
-        setUser(DEMO_USERS.superadmin);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.superadmin));
-        return { success: true, role: 'superadmin' };
-      }
-
-      if (cleanEmail === 'owner@voltspot.demo') {
-        if (pass !== 'Owner123!') return { success: false, error: 'Incorrect password' };
-        setUser(DEMO_USERS.admin);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.admin));
-        return { success: true, role: 'admin' };
-      }
-
-      if (cleanEmail === 'driver@voltspot.demo') {
-        if (pass !== 'Driver123!') return { success: false, error: 'Incorrect password' };
-        setUser(DEMO_USERS.driver);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(DEMO_USERS.driver));
-        return { success: true, role: 'driver' };
-      }
-
       return { success: false, error: 'Invalid credentials or user not found. Please verify your email and password.' };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Login failed' };
@@ -248,12 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
-  const switchDemoRole = (role: UserRole) => {
-    const selected = DEMO_USERS[role];
-    setUser(selected);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(selected));
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -262,7 +211,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
-        switchDemoRole,
       }}
     >
       {children}

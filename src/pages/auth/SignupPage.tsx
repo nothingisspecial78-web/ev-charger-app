@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, UserPlus, AlertCircle, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Zap, UserPlus, AlertCircle, Eye, EyeOff, Car, PlugZap } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -45,23 +45,23 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-8 sm:py-16 px-3 sm:px-0 space-y-6">
-      <div className="bg-white rounded-3xl border border-border p-6 sm:p-9 shadow-card space-y-6">
+    <div className="mx-auto max-w-[400px] px-3 py-8 sm:py-16">
+      <div className="space-y-6 rounded-card border border-border bg-surface p-6 sm:p-8">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#174D3A] to-[#1F6B50] text-[#C8F169] flex items-center justify-center mx-auto shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-control bg-primary text-accent">
             <Zap className="w-7 h-7 fill-current" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#17231F] tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Create your VoltSpot Account
           </h1>
-          <p className="text-xs sm:text-sm text-[#66736D]">
+          <p className="text-sm text-muted">
             Join as an EV driver or register as a private/commercial charger host.
           </p>
         </div>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-xs text-rose-700 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 rounded-control border border-danger/20 bg-danger-bg p-3.5 text-sm text-danger-fg" role="alert">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
             <span>{error}</span>
           </div>
         )}
@@ -69,84 +69,91 @@ export const SignupPage: React.FC = () => {
         <form onSubmit={handleSignup} className="space-y-4">
           {/* Account Role Selector */}
           <div>
-            <label className="block text-xs font-bold text-[#17231F] mb-1.5">
+            <span className="mb-1.5 block text-sm font-semibold text-foreground">
               I want to use VoltSpot primarily as:
-            </label>
-            <div className="grid grid-cols-2 gap-2">
+            </span>
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Primary VoltSpot role">
               <button
                 type="button"
                 onClick={() => setRole('driver')}
-                className={`py-3 px-3 rounded-xl text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 min-h-[44px] ${
+                role="radio"
+                aria-checked={role === 'driver'}
+                className={`flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-control border px-3 text-sm font-semibold transition-colors ${
                   role === 'driver'
-                    ? 'bg-[#174D3A] text-white border-[#174D3A] shadow-xs'
-                    : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F]'
+                    ? 'border-primary bg-primary-50 text-primary'
+                    : 'border-border bg-surface-muted text-muted hover:text-foreground'
                 }`}
               >
-                <span>🚗 EV Driver</span>
+                <Car className="h-5 w-5" /><span>EV driver</span>
               </button>
               <button
                 type="button"
                 onClick={() => setRole('admin')}
-                className={`py-3 px-3 rounded-xl text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 min-h-[44px] ${
+                role="radio"
+                aria-checked={role === 'admin'}
+                className={`flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-control border px-3 text-sm font-semibold transition-colors ${
                   role === 'admin'
-                    ? 'bg-[#174D3A] text-white border-[#174D3A] shadow-xs'
-                    : 'bg-[#F5F7F4] text-[#66736D] border-border hover:text-[#17231F]'
+                    ? 'border-primary bg-primary-50 text-primary'
+                    : 'border-border bg-surface-muted text-muted hover:text-foreground'
                 }`}
               >
-                <span>⚡ Charger Host</span>
+                <PlugZap className="h-5 w-5" /><span>Charger host</span>
               </button>
             </div>
-            <span className="text-[10px] text-[#66736D] mt-1.5 block">
+            <span className="mt-1.5 block text-xs text-muted">
               Superadmin privileges are securely provisioned and cannot be self-selected.
             </span>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#17231F] mb-1.5">
+            <label htmlFor="signup-name" className="mb-1.5 block text-sm font-semibold text-foreground">
               Full Name / Display Name *
             </label>
             <input
+              id="signup-name"
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Rahul Sharma"
               required
-              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
+              className="min-h-[44px] w-full rounded-control border border-border px-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#17231F] mb-1.5">
+            <label htmlFor="signup-email" className="mb-1.5 block text-sm font-semibold text-foreground">
               Email Address *
             </label>
             <input
+              id="signup-email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="name@example.com"
               required
-              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
+              className="min-h-[44px] w-full rounded-control border border-border px-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#17231F] mb-1.5">
+            <label htmlFor="signup-password" className="mb-1.5 block text-sm font-semibold text-foreground">
               Password * (Min 6 characters)
             </label>
             <div className="relative">
               <input
+                id="signup-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 minLength={6}
-                className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 pr-10 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
+                className="min-h-[44px] w-full rounded-control border border-border px-3 pr-10 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted hover:bg-surface-muted hover:text-foreground"
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -155,40 +162,41 @@ export const SignupPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#17231F] mb-1.5">
+            <label htmlFor="signup-phone" className="mb-1.5 block text-sm font-semibold text-foreground">
               Phone Number (For Host Coordination)
             </label>
             <input
+              id="signup-phone"
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="+91 98765 43210"
-              className="w-full text-xs sm:text-sm rounded-xl border border-border p-3 focus:outline-none focus:ring-2 focus:ring-[#174D3A] min-h-[44px] font-medium"
+              className="min-h-[44px] w-full rounded-control border border-border px-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-4 px-4 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-xs sm:text-sm font-extrabold transition-all shadow-card hover:shadow-elevated flex items-center justify-center gap-2 disabled:opacity-60 min-h-[46px] group"
+            className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-control bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-60"
           >
             {submitting ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                 <span>Creating Account...</span>
               </>
             ) : (
               <>
-                <UserPlus className="w-4 h-4 text-[#C8F169] group-hover:translate-x-0.5 transition-transform" />
+                <UserPlus className="h-4 w-4 text-accent" />
                 <span>Complete Registration</span>
               </>
             )}
           </button>
         </form>
 
-        <div className="text-center text-xs text-[#66736D] pt-1">
+        <div className="pt-1 text-center text-sm text-muted">
           Already have an account?{' '}
-          <Link to="/login" className="font-extrabold text-[#174D3A] hover:underline">
+          <Link to="/login" className="font-semibold text-primary hover:underline">
             Sign In here
           </Link>
         </div>

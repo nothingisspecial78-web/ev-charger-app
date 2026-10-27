@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { RequestStatusBadge } from '@/components/common/Badges';
 import { EmptyState, ErrorState, ConfirmModal } from '@/components/common/Feedback';
 import { getGoogleMapsNavUrl, calculateDistanceKm, estimateDrivingMinutes } from '@/utils/geo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/Toast';
 import {
   CalendarCheck2,
   Clock,
@@ -25,6 +26,8 @@ import {
 
 export const DriverRequestsPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [requests, setRequests] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +86,7 @@ export const DriverRequestsPage: React.FC = () => {
       setCancellingRequest(null);
       await fetchRequests();
     } catch (err: any) {
-      alert(err?.message || 'Failed to cancel request');
+      toast(err?.message || 'Failed to cancel request', 'error');
     } finally {
       setCancelling(false);
     }
@@ -103,14 +106,14 @@ export const DriverRequestsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-extrabold text-[#174D3A] uppercase tracking-wider mb-1.5">
+          <div className="flex items-center gap-2 text-xs font-extrabold text-primary uppercase tracking-wider mb-1.5">
             <CalendarCheck2 className="w-4 h-4" />
             <span>Driver Session Tracker</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-[#17231F] tracking-tight">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             My Booking Requests
           </h1>
-          <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
+          <p className="text-xs sm:text-sm text-muted mt-1 font-medium">
             Monitor host confirmations, access turn-by-turn routes in Google Maps, and contact station owners.
           </p>
         </div>
@@ -118,7 +121,7 @@ export const DriverRequestsPage: React.FC = () => {
         <button
           onClick={fetchRequests}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-border text-xs font-bold text-[#17231F] hover:bg-gray-50 self-start sm:self-auto shadow-2xs hover:shadow-xs min-h-[40px] transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-border text-xs font-bold text-foreground hover:bg-gray-50 self-start sm:self-auto shadow-2xs hover:shadow-xs min-h-[40px] transition-all"
         >
           <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Status</span>
@@ -145,14 +148,14 @@ export const DriverRequestsPage: React.FC = () => {
               onClick={() => setStatusFilter(tab)}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap min-h-[38px] ${
                 statusFilter === tab
-                  ? 'bg-[#174D3A] text-white shadow-xs'
-                  : 'bg-white text-[#66736D] border border-border hover:text-[#17231F] hover:bg-gray-50'
+                  ? 'bg-primary text-white shadow-xs'
+                  : 'bg-white text-muted border border-border hover:text-foreground hover:bg-gray-50'
               }`}
             >
               <span>{labels[tab]}</span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                  statusFilter === tab ? 'bg-white/20 text-white' : 'bg-[#F5F7F4] text-[#17231F]'
+                  statusFilter === tab ? 'bg-white/20 text-white' : 'bg-background text-foreground'
                 }`}
               >
                 {count}
@@ -178,7 +181,7 @@ export const DriverRequestsPage: React.FC = () => {
           title={statusFilter === 'all' ? 'No session requests yet' : `No ${statusFilter} requests`}
           description="Browse active chargers on the map and submit your reservation query to local hosts."
           actionText="Discover Stations"
-          onAction={() => (window.location.href = '/chargers')}
+          onAction={() => navigate('/chargers')}
         />
       ) : (
         <div className="space-y-5">
@@ -212,17 +215,17 @@ export const DriverRequestsPage: React.FC = () => {
                 {/* Card Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-4">
                   <div className="min-w-0">
-                    <h3 className="font-extrabold text-lg text-[#17231F] truncate">
+                    <h3 className="font-extrabold text-lg text-foreground truncate">
                       {charger?.name || 'Charging Station'}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-[#66736D] mt-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#174D3A] shrink-0" />
+                    <div className="flex items-center gap-1.5 text-xs text-muted mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span className="truncate">{charger?.address || charger?.area}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
-                    <span className="text-[11px] font-mono font-bold text-[#66736D] bg-gray-100 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-mono font-bold text-muted bg-gray-100 px-2 py-0.5 rounded-md">
                       Ref: {req.id.slice(0, 8)}
                     </span>
                     <RequestStatusBadge status={req.status} />
@@ -231,7 +234,7 @@ export const DriverRequestsPage: React.FC = () => {
 
                 {/* APPROVED HERO NAVIGATION BANNER */}
                 {req.status === 'approved' && (
-                  <div className="bg-gradient-to-r from-[#EAF3EF] to-[#D5EADB] border border-[#A6D5BF] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                  <div className="bg-primary-50 border border-primary-200 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -239,11 +242,11 @@ export const DriverRequestsPage: React.FC = () => {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
                           </span>
-                          <span className="font-extrabold text-base text-[#174D3A]">
+                          <span className="font-extrabold text-base text-primary">
                             Charging Bay Confirmed & Ready!
                           </span>
                         </div>
-                        <p className="text-xs text-[#17231F]">
+                        <p className="text-xs text-foreground">
                           {dist !== null ? (
                             <span>
                               Estimated travel time: <strong>~{travelMins} mins</strong> ({dist.toFixed(1)} km)
@@ -259,9 +262,9 @@ export const DriverRequestsPage: React.FC = () => {
                         href={navUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#174D3A] hover:bg-[#123D2E] text-white text-xs sm:text-sm font-extrabold transition shadow-card whitespace-nowrap min-h-[44px]"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs sm:text-sm font-extrabold transition shadow-card whitespace-nowrap min-h-[44px]"
                       >
-                        <Navigation className="w-4 h-4 text-[#C8F169]" />
+                        <Navigation className="w-4 h-4 text-accent" />
                         <span>Navigate in Google Maps</span>
                         <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                       </a>
@@ -269,9 +272,9 @@ export const DriverRequestsPage: React.FC = () => {
 
                     {/* Host Phone Number Sharing */}
                     {charger?.owner?.phone && (
-                      <div className="pt-3 border-t border-[#A6D5BF]/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <div className="flex items-center gap-2 text-[#174D3A]">
-                          <Phone className="w-4 h-4 text-[#174D3A]" />
+                      <div className="pt-3 border-t border-primary-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2 text-primary">
+                          <Phone className="w-4 h-4 text-primary" />
                           <span>
                             Host Contact ({charger.owner.display_name?.split(' ')[0]}):{' '}
                             <strong>{charger.owner.phone}</strong>
@@ -281,7 +284,7 @@ export const DriverRequestsPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <a
                             href={`tel:${charger.owner.phone}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#A6D5BF] font-bold text-[#174D3A] hover:bg-emerald-50 transition min-h-[34px]"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-200 font-bold text-primary hover:bg-emerald-50 transition min-h-[34px]"
                           >
                             <Phone className="w-3.5 h-3.5" />
                             <span>Call Host</span>
@@ -289,7 +292,7 @@ export const DriverRequestsPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => copyToClipboard(charger.owner!.phone!)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#A6D5BF] font-bold text-[#174D3A] hover:bg-emerald-50 transition min-h-[34px]"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-200 font-bold text-primary hover:bg-emerald-50 transition min-h-[34px]"
                             title="Copy host phone number"
                           >
                             {copiedPhone === charger.owner.phone ? (
@@ -306,11 +309,11 @@ export const DriverRequestsPage: React.FC = () => {
                 )}
 
                 {/* Time & Duration Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#F5F7F4] rounded-2xl p-4 text-xs border border-[#E8EDE9]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-background rounded-2xl p-4 text-xs border border-border">
                   <div>
-                    <span className="text-[#66736D] block font-semibold">Scheduled Slot</span>
-                    <span className="font-extrabold text-[#17231F] flex items-center gap-1.5 mt-1">
-                      <Calendar className="w-4 h-4 text-[#174D3A]" />
+                    <span className="text-muted block font-semibold">Scheduled Slot</span>
+                    <span className="font-extrabold text-foreground flex items-center gap-1.5 mt-1">
+                      <Calendar className="w-4 h-4 text-primary" />
                       {new Date(req.requested_start).toLocaleString([], {
                         month: 'short',
                         day: 'numeric',
@@ -320,15 +323,15 @@ export const DriverRequestsPage: React.FC = () => {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#66736D] block font-semibold">Duration</span>
-                    <span className="font-extrabold text-[#17231F] flex items-center gap-1.5 mt-1">
-                      <Clock className="w-4 h-4 text-[#174D3A]" />
+                    <span className="text-muted block font-semibold">Duration</span>
+                    <span className="font-extrabold text-foreground flex items-center gap-1.5 mt-1">
+                      <Clock className="w-4 h-4 text-primary" />
                       {req.duration_minutes} mins
                     </span>
                   </div>
                   <div className="col-span-2 sm:col-span-1">
-                    <span className="text-[#66736D] block font-semibold">Submitted Time</span>
-                    <span className="text-[#17231F] font-bold mt-1 block">
+                    <span className="text-muted block font-semibold">Submitted Time</span>
+                    <span className="text-foreground font-bold mt-1 block">
                       {new Date(req.created_at).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -339,14 +342,14 @@ export const DriverRequestsPage: React.FC = () => {
 
                 {/* Driver Note */}
                 {req.driver_note && (
-                  <div className="text-xs text-[#66736D] bg-[#FAFCFA] rounded-2xl p-3.5 border border-border">
-                    <span className="font-bold text-[#17231F]">Your Vehicle Note:</span> "{req.driver_note}"
+                  <div className="text-xs text-muted bg-surface-muted rounded-2xl p-3.5 border border-border">
+                    <span className="font-bold text-foreground">Your Vehicle Note:</span> "{req.driver_note}"
                   </div>
                 )}
 
                 {/* Host Response Note */}
                 {req.owner_response_note && (
-                  <div className="text-xs bg-[#EAF3EF] border border-[#C5DED3] rounded-2xl p-3.5 text-[#174D3A] flex items-start gap-2.5">
+                  <div className="text-xs bg-primary-50 border border-primary-200 rounded-2xl p-3.5 text-primary flex items-start gap-2.5">
                     <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-extrabold">Host Instructions:</span> "{req.owner_response_note}"
@@ -359,7 +362,7 @@ export const DriverRequestsPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <Link
                       to={`/chargers/${req.charger_id}`}
-                      className="text-xs font-bold text-[#174D3A] hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
                     >
                       <span>View Station Specs</span>
                       <ArrowRight className="w-3.5 h-3.5" />

@@ -1,349 +1,77 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { ToastProvider } from '@/components/ui/Toast';
 import {
-  Zap,
-  MapPin,
-  CalendarCheck2,
-  LayoutDashboard,
-  Shield,
-  LogOut,
-  Menu,
-  X,
-  PlusCircle,
-  ListOrdered,
-  Users,
-  Sparkles,
-  ChevronRight,
-  User,
+  Zap, MapPin, CalendarCheck2, LayoutDashboard, Shield, LogOut, Menu, X,
+  PlusCircle, ListOrdered, Users, ChevronDown, UserCircle,
 } from 'lucide-react';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const isOwnerRoute = location.pathname.startsWith('/owner');
   const isSuperadminRoute = location.pathname.startsWith('/superadmin');
-
   const navLinks = [
-    { name: 'Discover Chargers', path: '/chargers', icon: MapPin, show: true },
-    {
-      name: 'My Booking Requests',
-      path: '/my-requests',
-      icon: CalendarCheck2,
-      show: Boolean(user),
-    },
-    {
-      name: 'Host Dashboard',
-      path: '/owner',
-      icon: LayoutDashboard,
-      show: user?.role === 'admin' || user?.role === 'superadmin',
-    },
-    {
-      name: 'Superadmin Oversight',
-      path: '/superadmin',
-      icon: Shield,
-      show: user?.role === 'superadmin',
-    },
+    { name: 'Discover', path: '/chargers', icon: MapPin, show: true },
+    { name: 'My requests', path: '/my-requests', icon: CalendarCheck2, show: Boolean(user) },
+    { name: 'Host dashboard', path: '/owner', icon: LayoutDashboard, show: user?.role === 'admin' || user?.role === 'superadmin' },
+    { name: 'Administration', path: '/superadmin', icon: Shield, show: user?.role === 'superadmin' },
   ];
+  const ownerLinks = [
+    { name: 'Overview', path: '/owner', icon: LayoutDashboard },
+    { name: 'My chargers', path: '/owner/chargers', icon: Zap },
+    { name: 'Add charger', path: '/owner/chargers/new', icon: PlusCircle },
+    { name: 'Requests', path: '/owner/requests', icon: ListOrdered },
+  ];
+  const adminLinks = [
+    { name: 'Overview', path: '/superadmin', icon: LayoutDashboard },
+    { name: 'Users', path: '/superadmin/users', icon: Users },
+    { name: 'Chargers', path: '/superadmin/chargers', icon: Zap },
+    { name: 'Requests', path: '/superadmin/requests', icon: ListOrdered },
+  ];
+  const roleLabel = user?.role === 'admin' ? 'Host' : user?.role === 'superadmin' ? 'Superadmin' : 'Driver';
+  const initials = user?.display_name?.slice(0, 1).toUpperCase() || 'U';
 
-  const ownerSidebarLinks = [
-    { name: 'Host Overview', path: '/owner', icon: LayoutDashboard },
-    { name: 'My Chargers', path: '/owner/chargers', icon: Zap },
-    { name: 'Add Charger', path: '/owner/chargers/new', icon: PlusCircle },
-    { name: 'Incoming Requests', path: '/owner/requests', icon: ListOrdered },
-  ];
-
-  const superadminSidebarLinks = [
-    { name: 'Platform Metrics', path: '/superadmin', icon: LayoutDashboard },
-    { name: 'Users Directory', path: '/superadmin/users', icon: Users },
-    { name: 'Charger Moderation', path: '/superadmin/chargers', icon: Zap },
-    { name: 'Requests Oversight', path: '/superadmin/requests', icon: ListOrdered },
-  ];
+  const signOut = async () => { await logout(); setProfileOpen(false); setMobileMenuOpen(false); };
+  const profilePanel = user && (
+    <div className="absolute right-0 top-12 z-50 w-56 rounded-control border border-border bg-surface p-2 shadow-lg">
+      <div className="border-b border-border px-3 py-2"><p className="truncate text-sm font-semibold text-foreground">{user.display_name}</p><p className="text-xs text-muted">{roleLabel}</p></div>
+      <button type="button" onClick={signOut} className="mt-1 flex min-h-[40px] w-full items-center gap-2 rounded-lg px-3 text-sm font-semibold text-danger hover:bg-danger-bg"><LogOut className="h-4 w-4" /> Sign out</button>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F7F4] text-[#17231F] w-full overflow-x-hidden selection:bg-[#C8F169] selection:text-[#17231F]">
-      {/* Top Navigation Bar - Glassmorphism Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-border shadow-xs transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Brand Wordmark */}
-          <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#174D3A] to-[#1F6B50] text-[#C8F169] flex items-center justify-center font-extrabold shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_15px_rgba(200,241,105,0.4)]">
-              <Zap className="w-5 h-5 fill-current" />
+    <ToastProvider>
+      <div className="flex min-h-screen w-full flex-col bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
+        <header className="sticky top-0 z-40 border-b border-border bg-surface">
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <Link to="/" className="flex items-center gap-2.5" aria-label="VoltSpot home">
+              <span className="flex h-9 w-9 items-center justify-center rounded-control bg-primary text-accent"><Zap className="h-5 w-5 fill-current" /></span>
+              <span className="text-xl font-bold tracking-tight">Volt<span className="text-primary">Spot</span></span>
+            </Link>
+            <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+              {navLinks.filter(link => link.show).map(link => { const Icon = link.icon; const active = location.pathname === link.path || (link.path !== '/chargers' && location.pathname.startsWith(link.path)); return <Link key={link.path} to={link.path} aria-current={active ? 'page' : undefined} className={`flex min-h-[40px] items-center gap-2 rounded-control px-3 text-sm font-semibold transition-colors ${active ? 'bg-primary-50 text-primary' : 'text-muted hover:bg-surface-muted hover:text-foreground'}`}><Icon className="h-4 w-4" />{link.name}</Link>; })}
+            </nav>
+            <div className="hidden items-center gap-3 md:flex">
+              {user ? <div className="relative"><button type="button" onClick={() => setProfileOpen(value => !value)} aria-expanded={profileOpen} className="flex min-h-[44px] items-center gap-2 rounded-control border border-border px-2.5 hover:bg-surface-muted"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-accent">{initials}</span><span className="max-w-[120px] truncate text-sm font-semibold">{user.display_name}</span><ChevronDown className="h-4 w-4 text-muted" /></button>{profileOpen && profilePanel}</div> : <><Link to="/login" className="flex min-h-[44px] items-center px-3 text-sm font-semibold text-muted hover:text-foreground">Sign in</Link><Link to="/signup" className="flex min-h-[44px] items-center rounded-control bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover">Create account</Link></>}
             </div>
-            <div>
-              <div className="flex items-center gap-1">
-                <span className="text-xl font-extrabold tracking-tight text-[#17231F]">Volt</span>
-                <span className="text-xl font-extrabold text-[#174D3A]">Spot</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mb-2"></span>
-              </div>
-              <div className="text-[10px] text-[#66736D] -mt-1 font-semibold tracking-wider uppercase hidden sm:block">
-                EV Charging Network
-              </div>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5">
-            {navLinks
-              .filter(link => link.show)
-              .map(link => {
-                const Icon = link.icon;
-                const active = location.pathname === link.path;
-                return (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
-                      active
-                        ? 'bg-[#EAF3EF] text-[#174D3A] shadow-xs'
-                        : 'text-[#66736D] hover:text-[#17231F] hover:bg-gray-100/70'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{link.name}</span>
-                  </Link>
-                );
-              })}
-          </nav>
-
-          {/* Right Actions / Auth Menu */}
-          <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <div className="flex items-center gap-2.5 bg-[#F5F7F4] pl-2.5 pr-2 py-1.5 rounded-2xl border border-border">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#174D3A] to-[#1F6B50] text-[#C8F169] text-xs font-black flex items-center justify-center shadow-2xs">
-                  {user.display_name ? user.display_name.charAt(0).toUpperCase() : 'U'}
-                </div>
-                <div className="text-left pr-1">
-                  <div className="text-xs font-extrabold text-[#17231F] leading-tight max-w-[140px] truncate">
-                    {user.display_name}
-                  </div>
-                  <div className="text-[10px] font-bold text-[#174D3A] uppercase tracking-wider">
-                    {user.role === 'admin'
-                      ? 'Charger Host'
-                      : user.role === 'superadmin'
-                      ? 'Superadmin'
-                      : 'EV Driver'}
-                  </div>
-                </div>
-                <button
-                  onClick={() => logout()}
-                  className="p-1.5 rounded-xl text-[#66736D] hover:text-rose-600 hover:bg-rose-50 transition min-h-[34px] min-w-[34px] flex items-center justify-center border border-transparent hover:border-rose-200"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 rounded-xl text-sm font-bold text-[#17231F] hover:bg-gray-100 transition min-h-[40px] flex items-center"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-[#174D3A] hover:bg-[#123D2E] text-white transition shadow-sm hover:shadow-card min-h-[40px] flex items-center gap-1.5"
-                >
-                  <span>Join VoltSpot</span>
-                  <ChevronRight className="w-4 h-4 text-[#C8F169]" />
-                </Link>
-              </div>
-            )}
+            <button type="button" onClick={() => setMobileMenuOpen(value => !value)} aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileMenuOpen} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control border border-border md:hidden">{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
           </div>
+          {mobileMenuOpen && <div className="border-t border-border bg-surface px-4 py-3 md:hidden"><nav className="space-y-1">{navLinks.filter(link => link.show).map(link => { const Icon = link.icon; const active = location.pathname === link.path; return <Link key={link.path} to={link.path} onClick={() => setMobileMenuOpen(false)} aria-current={active ? 'page' : undefined} className={`flex min-h-[44px] items-center gap-3 rounded-control px-3 text-sm font-semibold ${active ? 'bg-primary-50 text-primary' : 'text-muted'}`}><Icon className="h-5 w-5" />{link.name}</Link>; })}</nav>{user ? <button type="button" onClick={signOut} className="mt-3 flex min-h-[44px] w-full items-center gap-2 border-t border-border pt-3 text-sm font-semibold text-danger"><LogOut className="h-4 w-4" />Sign out</button> : <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="mt-3 flex min-h-[44px] items-center border-t border-border pt-3 text-sm font-semibold text-primary">Sign in</Link>}</div>}
+        </header>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl border border-border text-[#17231F] min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-gray-50"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+        <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 sm:px-6 sm:py-8 md:pb-8 lg:px-8">
+          {isOwnerRoute || isSuperadminRoute ? <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_minmax(0,1fr)]"><aside className="self-start md:sticky md:top-24"><div className="rounded-card border border-border bg-surface p-2"><p className="px-3 py-2 text-xs font-semibold text-muted">{isOwnerRoute ? 'Host workspace' : 'Platform administration'}</p><nav className="flex gap-1 overflow-x-auto no-scrollbar md:flex-col">{(isOwnerRoute ? ownerLinks : adminLinks).map(item => { const Icon = item.icon; const active = location.pathname === item.path; return <Link key={item.path} to={item.path} aria-current={active ? 'page' : undefined} className={`flex min-h-[42px] items-center gap-2 rounded-control border-l-[3px] px-3 text-sm font-semibold whitespace-nowrap ${active ? 'border-accent bg-primary-50 text-primary' : 'border-transparent text-muted hover:bg-surface-muted hover:text-foreground'}`}><Icon className="h-4 w-4" />{item.name}</Link>; })}</nav></div>{isOwnerRoute && <p className="mt-3 hidden rounded-card bg-primary-50 p-3 text-xs leading-5 text-primary md:block">Keep listing details current so drivers can make informed requests.</p>}</aside><main className="min-w-0">{children}</main></div> : <main className="min-w-0">{children}</main>}
         </div>
 
-        {/* Mobile Dropdown Menu with full touch accessibility */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-white px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-2 duration-150 shadow-lg">
-            {navLinks
-              .filter(link => link.show)
-              .map(link => {
-                const Icon = link.icon;
-                const active = location.pathname === link.path;
-                return (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold min-h-[48px] ${
-                      active
-                        ? 'bg-[#EAF3EF] text-[#174D3A]'
-                        : 'text-[#66736D] hover:bg-gray-50'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5 text-[#174D3A]" />
-                    <span>{link.name}</span>
-                  </Link>
-                );
-              })}
-
-            <div className="pt-3 border-t border-border flex items-center justify-between">
-              {user ? (
-                <>
-                  <div className="min-w-0 pr-2">
-                    <div className="text-sm font-bold text-[#17231F] truncate">{user.display_name}</div>
-                    <div className="text-xs text-[#174D3A] font-semibold uppercase">{user.role}</div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-rose-600 bg-rose-50 rounded-xl min-h-[40px]"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
-                </>
-              ) : (
-                <div className="w-full flex gap-2">
-                  <Link
-                    to="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-3 text-center text-sm font-bold border border-border rounded-xl min-h-[44px] flex items-center justify-center"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-3 text-center text-sm font-bold bg-[#174D3A] text-white rounded-xl min-h-[44px] flex items-center justify-center"
-                  >
-                    Join
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Main Workspace */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
-        {isOwnerRoute || isSuperadminRoute ? (
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-8">
-            {/* Top/Sidebar Nav for Owner / Superadmin */}
-            <aside className="md:col-span-3 space-y-4">
-              <div className="bg-white rounded-3xl border border-border p-4 sm:p-5 shadow-card">
-                <div className="px-2 py-1 text-xs font-extrabold uppercase tracking-wider text-[#174D3A] flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isOwnerRoute ? 'Host Management' : 'Superadmin Tools'}</span>
-                </div>
-
-                {/* Horizontal scroll on mobile (<768px), vertical sidebar on desktop */}
-                <nav className="flex md:flex-col gap-1.5 mt-3 overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                  {(isOwnerRoute ? ownerSidebarLinks : superadminSidebarLinks).map(item => {
-                    const Icon = item.icon;
-                    const active = location.pathname === item.path;
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap min-h-[42px] ${
-                          active
-                            ? 'bg-[#EAF3EF] text-[#174D3A] md:border-l-4 md:border-[#C8F169] shadow-2xs'
-                            : 'text-[#66736D] hover:bg-gray-50 hover:text-[#17231F]'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
-                        <span>{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </div>
-
-              {isOwnerRoute && (
-                <div className="hidden md:block bg-gradient-to-br from-[#174D3A] to-[#123D2E] text-white rounded-3xl p-5 shadow-card text-xs space-y-2.5 border border-[#174D3A]">
-                  <div className="font-extrabold flex items-center gap-1.5 text-[#C8F169] text-sm">
-                    <Zap className="w-4 h-4 fill-current" />
-                    <span>Host Pro Tip</span>
-                  </div>
-                  <p className="text-gray-200 leading-relaxed text-xs">
-                    Confirm incoming driver booking requests promptly to improve your station's reliability score and attract more repeat drivers.
-                  </p>
-                </div>
-              )}
-            </aside>
-
-            {/* Content Area */}
-            <main className="md:col-span-9 min-w-0">{children}</main>
-          </div>
-        ) : (
-          <main className="min-w-0">{children}</main>
-        )}
+        {user && <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-surface px-2 py-1 md:hidden"><Link to="/chargers" aria-current={location.pathname === '/chargers' ? 'page' : undefined} className={`flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-3 text-xs font-semibold ${location.pathname === '/chargers' ? 'text-primary' : 'text-muted'}`}><MapPin className="h-5 w-5" />Discover</Link><Link to="/my-requests" aria-current={location.pathname === '/my-requests' ? 'page' : undefined} className={`flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-3 text-xs font-semibold ${location.pathname === '/my-requests' ? 'text-primary' : 'text-muted'}`}><CalendarCheck2 className="h-5 w-5" />Requests</Link><button type="button" onClick={() => setProfileOpen(value => !value)} aria-expanded={profileOpen} className="flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-3 text-xs font-semibold text-muted"><UserCircle className="h-5 w-5" />Account</button></div>}
+        {user && profileOpen && <div className="fixed inset-x-4 bottom-20 z-50 rounded-card border border-border bg-surface p-4 shadow-lg md:hidden"><p className="font-semibold">{user.display_name}</p><p className="text-sm text-muted">{roleLabel}</p><button type="button" onClick={signOut} className="mt-3 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-control bg-danger-bg text-sm font-semibold text-danger"><LogOut className="h-4 w-4" />Sign out</button></div>}
+        <footer className="border-t border-border bg-surface py-6"><div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 text-center text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><span className="font-semibold text-foreground">VoltSpot</span><span>Find a plug. Request a slot. Get moving.</span></div></footer>
       </div>
-
-      {/* Mobile Bottom Navigation Bar (App Experience) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-2 py-1 flex items-center justify-around shadow-lg">
-        <Link
-          to="/chargers"
-          className={`flex flex-col items-center justify-center p-2 rounded-xl text-[11px] font-bold min-h-[44px] ${
-            location.pathname === '/chargers' ? 'text-[#174D3A]' : 'text-[#66736D]'
-          }`}
-        >
-          <MapPin className="w-5 h-5 mb-0.5" />
-          <span>Discover</span>
-        </Link>
-        <Link
-          to="/my-requests"
-          className={`flex flex-col items-center justify-center p-2 rounded-xl text-[11px] font-bold min-h-[44px] ${
-            location.pathname === '/my-requests' ? 'text-[#174D3A]' : 'text-[#66736D]'
-          }`}
-        >
-          <CalendarCheck2 className="w-5 h-5 mb-0.5" />
-          <span>Requests</span>
-        </Link>
-        {(user?.role === 'admin' || user?.role === 'superadmin') && (
-          <Link
-            to="/owner"
-            className={`flex flex-col items-center justify-center p-2 rounded-xl text-[11px] font-bold min-h-[44px] ${
-              location.pathname.startsWith('/owner') ? 'text-[#174D3A]' : 'text-[#66736D]'
-            }`}
-          >
-            <LayoutDashboard className="w-5 h-5 mb-0.5" />
-            <span>Host Hub</span>
-          </Link>
-        )}
-        <Link
-          to={user ? '/my-requests' : '/login'}
-          className="flex flex-col items-center justify-center p-2 rounded-xl text-[11px] font-bold min-h-[44px] text-[#66736D]"
-        >
-          <Zap className="w-5 h-5 mb-0.5 text-[#174D3A]" />
-          <span>{user ? 'Account' : 'Sign In'}</span>
-        </Link>
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-auto border-t border-border bg-white text-xs text-[#66736D] py-8 pb-20 md:pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-2">
-            <span className="font-extrabold text-[#17231F] text-sm">VoltSpot</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="text-xs">Find a plug. Request a slot. Get moving.</span>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-[11px]">
-            <span className="inline-flex items-center gap-1.5 text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              PostgreSQL Row-Level Security
-            </span>
-            <span className="font-medium">OpenStreetMap & Leaflet Geocoding</span>
-            <span className="text-gray-400">VoltSpot EV Network</span>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </ToastProvider>
   );
 };
